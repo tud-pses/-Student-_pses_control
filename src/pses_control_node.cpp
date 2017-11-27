@@ -79,7 +79,9 @@ void PsesControl::pidControl() {
             m_e_sum = m_e_sum + m_e;
             ros::Time time_now = ros::Time::now();
             double dt = time_now.toSec() - m_time_last.toSec();
-            m_steering.data = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
+            double steering_angle = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
+            m_steering.data = 7869.8 * pow(steering_angle, 5) - 17042 * pow(steering_angle, 4) - 1587 * pow(steering_angle, 3) + 3098 * pow(steering_angle, 2) + 2471.8 * steering_angle - 127.6;
+            ROS_INFO_STREAM(m_steering.data);
             m_time_last = time_now;
             m_e_last = m_e;
 
