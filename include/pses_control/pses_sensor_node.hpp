@@ -19,12 +19,16 @@ public:
 private:
     // Variables
     std_msgs::UInt8 msg_hall_counter;
-
+    std_msgs::Float64 msg_hall_dt, msg_hall_dt8;
     // Subscriber
-    ros::Subscriber subscriber_hall_counter;
+    ros::Subscriber sub_hall_counter;
+    ros::Subscriber sub_hall_dt;
+    ros::Subscriber sub_hall_dt8;
 
     // Functions
-    //static void uslCallback(sensor_msgs::Range::ConstPtr uslMsg, sensor_msgs::Range* m_usl);
+    void hall_cntCallback(std_msgs::UInt8 hall_cnt_msg, std_msgs::UInt8* m_hall_cnt);
+    void calculateVelocity();
+
 
 };
 #endif //PSES_SENSOR_NODE_HPP
