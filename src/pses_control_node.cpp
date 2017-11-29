@@ -3,13 +3,19 @@
 
 
 PsesControl::PsesControl() {
-
+    ros::NodeHandle params("~");	// use this for private params
+    std::string usr_topic, usl_topic, usf_topic, color_topic, depth_topic;
+    params.param<std::string>("usr", usr_topic, "/uc_bridge/usr"/*"usr_filtered"*/);
+    params.param<std::string>("usl", usl_topic, "/uc_bridge/usl"/*"usl_filtered"*/);
+    params.param<std::string>("usf", usf_topic, "/uc_bridge/usf"/*"usf_filtered"*/);
+    params.param<std::string>("color_image", color_topic, "/kinect2/hd/image_color_rect");
+    params.param<std::string>("depth_image", depth_topic, "/kinect2/sd/image_depth_rect");
     m_pub_velocity = nh.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
     m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
 
-    m_sub_usr = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usr", 10, boost::bind(usrCallback, _1, &m_usr));
-    m_sub_usl = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usl", 10, boost::bind(uslCallback, _1, &m_usl));
-    m_sub_usf = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usf", 10, boost::bind(usfCallback, _1, &m_usf));
+    m_sub_usr = nh.subscribe<sensor_msgs::Range>(usr_topic, 10, boost::bind(usrCallback, _1, &m_usr));
+    m_sub_usl = nh.subscribe<sensor_msgs::Range>(usl_topic, 10, boost::bind(uslCallback, _1, &m_usl));
+    m_sub_usf = nh.subscribe<sensor_msgs::Range>(usf_topic, 10, boost::bind(usfCallback, _1, &m_usf));
 
     dynamic_reconfigure::Server<pses_control::controllerConfig>::CallbackType f;
     f = boost::bind(&PsesControl::paramCallback, this, _1, _2);
@@ -80,19 +86,29 @@ void PsesControl::pidControl() {
             ros::Time time_now = ros::Time::now();
             double dt = time_now.toSec() - m_time_last.toSec();
             double steering_angle = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
+
+            // Limit for steering angle
+            if (steering_angle > 0.3316)
+            {
+              steering_angle = 0.3316;
+            }
+            else if (steering_angle < -0.3374){
+              steering_angle = -0.3374;
+            }
+
+            //m_steering.data = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
             m_steering.data = 7869.8 * pow(steering_angle, 5) - 17042 * pow(steering_angle, 4) - 1587 * pow(steering_angle, 3) + 3098 * pow(steering_angle, 2) + 2471.8 * steering_angle - 127.6;
-            ROS_INFO_STREAM(m_steering.data);
             m_time_last = time_now;
             m_e_last = m_e;
 
             /* limit controller output */
-            if (m_steering.data > m_steering_max.data)
+            /*if (m_steering.data > m_steering_max.data)
             {
                 m_steering.data = m_steering_max.data;
             }
             else if (m_steering.data < m_steering_min.data){
                 m_steering.data = m_steering_min.data;
-            }
+            }*/
         }
     }
     m_pub_velocity.publish(m_velocity);
@@ -112,9 +128,8 @@ void signalHandler(int sig) {
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "pses_control_node", ros::init_options::NoSigintHandler);
-    ros::NodeHandle _nh("~");	// use this for private params
-    ros::Rate loop_rate(10);
     PsesControl controller;
+    ros::Rate loop_rate(10);
     signal(SIGINT, signalHandler);
     while (ros::ok()) {
         controller.pidControl();
