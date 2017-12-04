@@ -9,12 +9,8 @@
 #include <ackermann_msgs/AckermannDriveStamped.h>
 
 ros::NodeHandle nh;	// use this for global access
-geometry_msgs::Twist m_cmd_vel;
+//geometry_msgs::Twist m_cmd_vel;
 
-void geometryCallback(geometry_msgs::Twist::ConstPtr cmdVelMsg, geometry_msgs::Twist* m_cmd_vel)
-{
-    *m_cmd_vel = *cmdVelMsg;
-}
 
 double convert_trans_rot_vel_to_steering_angle(double v, double omega, double wheelbase){
 
@@ -27,10 +23,10 @@ double convert_trans_rot_vel_to_steering_angle(double v, double omega, double wh
   return atan(wheelbase/radius);
 }
 
-void cmd_callback(const geometry_msgs::Twist data){
+void cmd_callback(geometry_msgs::Twist::ConstPtr data){
   double wheelbase = 0.2;
-  double v = data.linear.x;
-  double steering = convert_trans_rot_vel_to_steering_angle(v, data.angular.z, wheelbase);
+  double v = data->linear.x;
+  double steering = convert_trans_rot_vel_to_steering_angle(v, data->angular.z, wheelbase);
   ackermann_msgs::AckermannDriveStamped ack_msg;
 
   ack_msg.header.stamp = ros::Time::now();
@@ -49,7 +45,7 @@ int main(int argc, char **argv)
  // ros::NodeHandle nh;
 
   std::string twist_cmd_topic;
-  ros::Subscriber m_sub_ackermann = nh.subscribe<geometry_msgs::Twist>("twist_cmd_topic", 10, boost::bind(geometryCallback, _1, &m_cmd_vel));
+  ros::Subscriber m_sub_ackermann = nh.subscribe<geometry_msgs::Twist>("twist_cmd_topic", 10, boost::bind(cmd_callback, _1));
 
   //nh.getParam("\twist_cmd_topic", cmd_vel);
   //nh.getParam("\ackermann_cmd_topic", ackermann_cmd_topic);
