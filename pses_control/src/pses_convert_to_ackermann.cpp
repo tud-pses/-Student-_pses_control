@@ -24,7 +24,7 @@ double convert_trans_rot_vel_to_steering_angle(double v, double omega, double wh
 }
 
 void cmd_callback(geometry_msgs::Twist::ConstPtr data){
-  double wheelbase = 0.2;
+  double wheelbase = 0.255;
   double v = data->linear.x;
   double steering = convert_trans_rot_vel_to_steering_angle(v, data->angular.z, wheelbase);
   ackermann_msgs::AckermannDriveStamped ack_msg;
