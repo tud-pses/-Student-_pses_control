@@ -48,7 +48,7 @@ void transformLaserScan(const sensor_msgs::LaserScan::ConstPtr& laser_scan_2d, t
 }
 
 int main(int argc, char** argv){
-  ros::init(argc, argv, "robot_tf_listener");
+  ros::init(argc, argv, "tf_listener");
   ros::NodeHandle n;
 
   tf::TransformListener listener(ros::Duration(10));
