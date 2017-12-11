@@ -8,7 +8,8 @@
 #include <geometry_msgs/Twist.h>
 #include <ackermann_msgs/AckermannDriveStamped.h>
 
-ros::NodeHandle nh;	// use this for global access
+        // use this for global access
+ackermann_msgs::AckermannDriveStamped ack_msg;
 //geometry_msgs::Twist m_cmd_vel;
 
 
@@ -27,32 +28,33 @@ void cmd_callback(const geometry_msgs::Twist::ConstPtr& data){
   double wheelbase = 0.255;
   double v = data->linear.x;
   double steering = convert_trans_rot_vel_to_steering_angle(v, data->angular.z, wheelbase);
-  ackermann_msgs::AckermannDriveStamped ack_msg;
 
   ack_msg.header.stamp = ros::Time::now();
   ack_msg.header.frame_id = "odom"; //todo
   ack_msg.drive.steering_angle = steering;
   ack_msg.drive.speed = v;
 
-  ros::Publisher m_pub_ackermann = nh.advertise<ackermann_msgs::AckermannDriveStamped>("ackermann_cmd_topic", 1);
-  m_pub_ackermann.publish(ack_msg);
-
 }
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "pses_convert_to_ackermann");
- // ros::NodeHandle nh;
+    ros::init(argc, argv, "pses_convert_to_ackermann");
+    ros::NodeHandle nh;
+    // ros::NodeHandle nh;
+    while (ros::ok()) {
+        std::string twist_cmd_topic;
+        ros::Subscriber m_sub_ackermann = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, boost::bind(cmd_callback, _1));
 
-  std::string twist_cmd_topic;
-  ros::Subscriber m_sub_ackermann = nh.subscribe<geometry_msgs::Twist>("twist_cmd_topic", 1, boost::bind(cmd_callback, _1));
+        ros::Publisher m_pub_ackermann = nh.advertise<ackermann_msgs::AckermannDriveStamped>("ackermann_cmd_topic", 1);
+        m_pub_ackermann.publish(ack_msg);
 
-  //nh.getParam("\twist_cmd_topic", cmd_vel);
-  //nh.getParam("\ackermann_cmd_topic", ackermann_cmd_topic);
-  //nh.getParam("\wheelbase", 1.0);
-  //nh.getParam("\frame_id", "odom");
+        //nh.getParam("\twist_cmd_topic", cmd_vel);
+        //nh.getParam("\ackermann_cmd_topic", ackermann_cmd_topic);
+        //nh.getParam("\wheelbase", 1.0);
+        //nh.getParam("\frame_id", "odom");
 
-  ros::spinOnce();
-  return 0;
-  ROS_INFO("Hello world!");
+        ros::spinOnce();
+    }
+    ROS_INFO("Hello world!");
+    return 0;
 } 
