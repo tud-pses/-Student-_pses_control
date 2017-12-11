@@ -1,9 +1,22 @@
 <launch>
-    <arg name="depth_image" default="/kinect2/sd/image_depth_rect"/>
 
-    <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
-            <remap from="image" to="$(arg depth_image)"/>
-    </node>
+        <arg name="depth_image" default="/kinect2/sd/image_depth_rect"/>
+        <arg name="camera_frame" default="camera_depth_frame"/>
+
+        <node pkg="pses_control" type="pses_control_node" name="pses_control" output="screen">
+        </node>
+
+        <!--Transform for cob_leg_detector-->
+        <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 base_laser camera_depth_frame 20" />
+
+        <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
+                <remap from="camera_depth_frame" to="base_link"/>
+        </include>
+
+        <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
+                <remap from="image" to="$(arg depth_image)"/>
+        </node>
+
 
     <node pkg="pses_odometry" type="odometry_node" name="odometry_node" output="screen">
     </node>

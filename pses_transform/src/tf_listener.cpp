@@ -52,7 +52,7 @@ int main(int argc, char** argv){
   ros::NodeHandle n;
 
   tf::TransformListener listener(ros::Duration(10));
-  ros::Subscriber m_sub_transform = n.subscribe<sensor_msgs::LaserScan>("laser_scan", 1, boost::bind(transformLaserScan, _1, &listener)); //TODO : change topic name
+  ros::Subscriber m_sub_transform = n.subscribe<sensor_msgs::LaserScan>("/scan", 1, boost::bind(transformLaserScan, _1, &listener)); //TODO : change topic name
 
 
   //we'll transform a point once every second
