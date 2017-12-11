@@ -45,7 +45,7 @@ int main(int argc, char **argv)
         std::string twist_cmd_topic;
         ros::Subscriber m_sub_ackermann = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, boost::bind(cmd_callback, _1));
 
-        ros::Publisher m_pub_ackermann = nh.advertise<ackermann_msgs::AckermannDriveStamped>("ackermann_cmd_topic", 1);
+        ros::Publisher m_pub_ackermann = nh.advertise<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 1);
         m_pub_ackermann.publish(ack_msg);
 
         //nh.getParam("\twist_cmd_topic", cmd_vel);

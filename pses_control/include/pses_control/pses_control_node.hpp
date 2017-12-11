@@ -5,6 +5,7 @@
 #include <std_msgs/String.h>
 #include <ros/ros.h>
 #include <sensor_msgs/Range.h>
+#include <ackermann_msgs/AckermannDriveStamped.h>
 #include <std_msgs/Int16.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -42,6 +43,7 @@ private:
     ros::Subscriber m_sub_usr;
     ros::Subscriber m_sub_usl;
     ros::Subscriber m_sub_usf;
+    ros::Subscriber m_sub_ackermann_cmd;
 
     // Publisher
     ros::Publisher m_pub_velocity;
@@ -52,6 +54,7 @@ private:
     static void usfCallback(sensor_msgs::Range::ConstPtr usfMsg, sensor_msgs::Range* m_usf);
     static void usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::Range* m_usr);
     void paramCallback(pses_control::controllerConfig &config, uint32_t level);
+    static void ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg);
 };
 
 void signalHandler(int sig);

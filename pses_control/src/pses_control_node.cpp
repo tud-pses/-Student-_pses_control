@@ -17,6 +17,8 @@ PsesControl::PsesControl() {
     m_sub_usl = nh.subscribe<sensor_msgs::Range>(usl_topic, 10, boost::bind(uslCallback, _1, &m_usl));
     m_sub_usf = nh.subscribe<sensor_msgs::Range>(usf_topic, 10, boost::bind(usfCallback, _1, &m_usf));
 
+    m_sub_ackermann_cmd = nh.subscribe<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 10, boost::bind(ackermannCmdCallback, _1));
+
     dynamic_reconfigure::Server<pses_control::controllerConfig>::CallbackType f;
     f = boost::bind(&PsesControl::paramCallback, this, _1, _2);
     m_server.setCallback(f);
@@ -29,6 +31,11 @@ PsesControl::PsesControl() {
     m_e_sum = 0;
     m_e = 0;
     m_e_last = 0;
+}
+
+void PsesControl::ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg)
+{
+    ROS_INFO("Ackermann Command : steering angle = %f - speed = %f", ackermannCmdMsg->drive.steering_angle, ackermannCmdMsg->drive.speed);
 }
 
 void PsesControl::uslCallback(sensor_msgs::Range::ConstPtr uslMsg, sensor_msgs::Range* m_usl)
