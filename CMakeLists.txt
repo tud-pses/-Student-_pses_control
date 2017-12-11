@@ -135,8 +135,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-  add_executable(PSES_control_node src/pses_control_node.cpp)  
-  add_executable(PSES_sensor_node src/pses_sensor_node.cpp)
+  add_executable(pses_control_node src/pses_control_node.cpp)  
+  add_executable(pses_sensor_node src/pses_sensor_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -147,12 +147,12 @@ include_directories(
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(PSES_control_node PSES_control_gencfg)
-add_dependencies(PSES_sensor_node PSES_sensor_gencfg)
+add_dependencies(pses_control_node pses_control_gencfg)
+add_dependencies(pses_sensor_node pses_sensor_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(PSES_control_node ${catkin_LIBRARIES})
-target_link_libraries(PSES_sensor_node ${catkin_LIBRARIES})
+target_link_libraries(pses_control_node ${catkin_LIBRARIES})
+target_link_libraries(pses_sensor_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##

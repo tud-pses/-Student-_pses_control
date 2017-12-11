@@ -31,7 +31,7 @@ void pses_sensor::usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::
     if(usrMsg->range != 0){
        float output_old = m_usr->range;
        *m_usr = *usrMsg;
-       m_usr->range = pses_sensor::lowpass(usrMsg->range, output_old, 20.0);
+       m_usr->range = pses_sensor::lowpass(usrMsg->range, output_old, 7.0);
 
     }
 }

@@ -1,5 +1,5 @@
-//#include "pses_control/pses_control_node.hpp"
-#include </home/pses/catkin_ws/src/pses_control/include/pses_control/pses_control_node.hpp>
+#include "pses_control/pses_control_node.hpp"
+//#include </home/pses/catkin_ws/src/pses_control/include/pses_control/pses_control_node.hpp>
 
 
 PsesControl::PsesControl() {
@@ -7,7 +7,7 @@ PsesControl::PsesControl() {
     m_pub_velocity = nh.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
     m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
 
-    m_sub_usr = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usr", 10, boost::bind(usrCallback, _1, &m_usr));
+    m_sub_usr = nh.subscribe<sensor_msgs::Range>("/sensor/usr", 10, boost::bind(usrCallback, _1, &m_usr));
     m_sub_usl = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usl", 10, boost::bind(uslCallback, _1, &m_usl));
     m_sub_usf = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usf", 10, boost::bind(usfCallback, _1, &m_usf));
 
