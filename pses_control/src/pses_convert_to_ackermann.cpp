@@ -7,6 +7,7 @@
 #include <math.h>
 #include <geometry_msgs/Twist.h>
 #include <ackermann_msgs/AckermannDriveStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 
         // use this for global access
 ackermann_msgs::AckermannDriveStamped ack_msg;
@@ -30,7 +31,7 @@ void cmd_callback(const geometry_msgs::Twist::ConstPtr& data){
   double steering = convert_trans_rot_vel_to_steering_angle(v, data->angular.z, wheelbase);
 
   ack_msg.header.stamp = ros::Time::now();
-  ack_msg.header.frame_id = "odom"; //todo
+  ack_msg.header.frame_id = "odom";
   ack_msg.drive.steering_angle = steering;
   ack_msg.drive.speed = v;
 
@@ -40,13 +41,24 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "pses_convert_to_ackermann");
     ros::NodeHandle nh;
+    ros::Subscriber m_sub_ackermann = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, boost::bind(cmd_callback, _1));
+    ros::Publisher m_pub_ackermann = nh.advertise<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 1);
+    ros::Publisher m_pub_goal = nh.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1);
     // ros::NodeHandle nh;
     while (ros::ok()) {
-        std::string twist_cmd_topic;
-        ros::Subscriber m_sub_ackermann = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, boost::bind(cmd_callback, _1));
+        geometry_msgs::PoseStamped goal_msg;
+        goal_msg.header.stamp = ros::Time::now();
+        goal_msg.header.frame_id = "map";
+        goal_msg.pose.position.x = 10;
+        goal_msg.pose.position.y = 0;
+        goal_msg.pose.position.z = 0;
+        goal_msg.pose.orientation.x = 0;
+        goal_msg.pose.orientation.y = 0;
+        goal_msg.pose.orientation.z = 0;
+        goal_msg.pose.orientation.w = 1;
 
-        ros::Publisher m_pub_ackermann = nh.advertise<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 1);
         m_pub_ackermann.publish(ack_msg);
+        m_pub_goal.publish(goal_msg);
 
         //nh.getParam("\twist_cmd_topic", cmd_vel);
         //nh.getParam("\ackermann_cmd_topic", ackermann_cmd_topic);
