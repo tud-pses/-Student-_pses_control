@@ -27,6 +27,7 @@ public:
 
     // Functions
     void pidControl();  // set private in the future
+    void driveTrajectory();
     void reset();
 
 private:
@@ -36,6 +37,7 @@ private:
     double m_e, m_e_sum, m_e_last;
     double m_target_value;
     sensor_msgs::Range m_usr, m_usf, m_usl;
+    double m_ack_vel, m_ack_steering;
     ros::Time m_time_last = ros::Time::now();
     std_msgs::Int16 m_velocity, m_velocity_config, m_steering, m_steering_min, m_steering_max;
 
@@ -54,7 +56,7 @@ private:
     static void usfCallback(sensor_msgs::Range::ConstPtr usfMsg, sensor_msgs::Range* m_usf);
     static void usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::Range* m_usr);
     void paramCallback(pses_control::controllerConfig &config, uint32_t level);
-    static void ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg);
+    static void ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double *m_ack_steering, double *m_ack_vel);
 };
 
 void signalHandler(int sig);

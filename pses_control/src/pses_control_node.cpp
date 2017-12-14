@@ -17,7 +17,7 @@ PsesControl::PsesControl() {
     m_sub_usl = nh.subscribe<sensor_msgs::Range>(usl_topic, 10, boost::bind(uslCallback, _1, &m_usl));
     m_sub_usf = nh.subscribe<sensor_msgs::Range>(usf_topic, 10, boost::bind(usfCallback, _1, &m_usf));
 
-    m_sub_ackermann_cmd = nh.subscribe<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 10, boost::bind(ackermannCmdCallback, _1));
+    m_sub_ackermann_cmd = nh.subscribe<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 10, boost::bind(ackermannCmdCallback, _1, &m_ack_steering, &m_ack_vel));
 
     dynamic_reconfigure::Server<pses_control::controllerConfig>::CallbackType f;
     f = boost::bind(&PsesControl::paramCallback, this, _1, _2);
@@ -33,9 +33,11 @@ PsesControl::PsesControl() {
     m_e_last = 0;
 }
 
-void PsesControl::ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg)
+void PsesControl::ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double* m_ack_steering, double* m_ack_vel)
 {
     ROS_INFO("Ackermann Command : steering angle = %f - speed = %f", ackermannCmdMsg->drive.steering_angle, ackermannCmdMsg->drive.speed);
+    *m_ack_steering=ackermannCmdMsg->drive.steering_angle;
+    *m_ack_vel=ackermannCmdMsg->drive.speed;
 }
 
 void PsesControl::uslCallback(sensor_msgs::Range::ConstPtr uslMsg, sensor_msgs::Range* m_usl)
@@ -51,6 +53,36 @@ void PsesControl::usfCallback(sensor_msgs::Range::ConstPtr usfMsg, sensor_msgs::
 void PsesControl::usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::Range* m_usr)
 {
     *m_usr = *usrMsg;
+}
+
+void PsesControl::driveTrajectory(){
+    // Limit for steering angle
+    if (m_ack_steering > 0.3316)
+    {
+      m_ack_steering = 0.3316;
+    }
+    else if (m_ack_steering < -0.3374){
+      m_ack_steering = -0.3374;
+    }
+
+    if (m_ack_vel > 0.5)
+    {
+      m_velocity.data = 300;
+    }
+    else if (m_ack_vel < -0.5){
+      m_velocity.data = -300;
+    }
+    else{
+        m_velocity.data = m_ack_vel*600;
+    }
+
+
+    //m_steering.data = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
+    m_steering.data = 7869.8 * pow(m_ack_steering, 5) - 17042 * pow(m_ack_steering, 4) - 1587 * pow(m_ack_steering, 3) + 3098 * pow(m_ack_steering, 2) + 2471.8 * m_ack_steering - 127.6;
+    ROS_INFO("Ackermann Command2 : steering angle = %d - speed = %d", m_steering.data, m_velocity.data);
+
+    m_pub_velocity.publish(m_velocity);
+    m_pub_steering.publish(m_steering);
 }
 
 void PsesControl::paramCallback(pses_control::controllerConfig &config, uint32_t level){
@@ -140,6 +172,7 @@ int main(int argc, char** argv) {
     signal(SIGINT, signalHandler);
     while (ros::ok()) {
         controller.pidControl();
+        //controller.driveTrajectory();
         if (stop_request) {
             controller.reset();
             ros::shutdown();

@@ -5,7 +5,7 @@
 
         <!--Transform for cob_leg_detector-->
         <node pkg="tf" type="static_transform_publisher" name="base_laser_broadcaster" args="0 0 0 0 0 0 1 base_laser camera_depth_frame 20" />
-        <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 odom base_link 20" />
+        <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 base_footprint base_link 20" />
 
         <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
                 <remap from="camera_depth_frame" to="base_link"/>
