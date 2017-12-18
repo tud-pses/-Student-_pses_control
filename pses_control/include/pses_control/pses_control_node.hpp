@@ -28,6 +28,7 @@ public:
     // Functions
     void pidControl();  // set private in the future
     void driveTrajectory();
+    void driveSteeringTest();
     void reset();
 
 private:
@@ -39,7 +40,7 @@ private:
     sensor_msgs::Range m_usr, m_usf, m_usl;
     double m_ack_vel, m_ack_steering;
     ros::Time m_time_last = ros::Time::now();
-    std_msgs::Int16 m_velocity, m_velocity_config, m_steering, m_steering_min, m_steering_max;
+    std_msgs::Int16 m_velocity, m_velocity_config, m_steering, m_steering_config, m_steering_min, m_steering_max;
 
     // Subscriber
     ros::Subscriber m_sub_usr;

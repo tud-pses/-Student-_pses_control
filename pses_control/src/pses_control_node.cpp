@@ -55,6 +55,15 @@ void PsesControl::usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::
     *m_usr = *usrMsg;
 }
 
+void PsesControl::driveSteeringTest(){
+    m_steering.data = m_steering_config.data;
+    m_velocity.data = 300;
+
+    m_pub_velocity.publish(m_velocity);
+    m_pub_steering.publish(m_steering);
+
+}
+
 void PsesControl::driveTrajectory(){
     // Limit for steering angle
     if (m_ack_steering > 0.3316)
@@ -92,6 +101,7 @@ void PsesControl::paramCallback(pses_control::controllerConfig &config, uint32_t
     m_ki = config.ki;
     m_kd = config.kd;
     m_velocity_config.data = config.velocity;
+    m_steering_config.data = config.steering;
     m_steering_min.data = config.pid_min;
     m_steering_max.data = config.pid_max;
 }
@@ -171,8 +181,9 @@ int main(int argc, char** argv) {
     ros::Rate loop_rate(10);
     signal(SIGINT, signalHandler);
     while (ros::ok()) {
-        controller.pidControl();
+        //controller.pidControl();
         //controller.driveTrajectory();
+        controller.driveSteeringTest();
         if (stop_request) {
             controller.reset();
             ros::shutdown();
