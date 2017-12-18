@@ -146,7 +146,8 @@ void PsesControl::pidControl() {
             }
 
             //m_steering.data = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
-            m_steering.data = 7869.8 * pow(steering_angle, 5) - 17042 * pow(steering_angle, 4) - 1587 * pow(steering_angle, 3) + 3098 * pow(steering_angle, 2) + 2471.8 * steering_angle - 127.6;
+            //m_steering.data = 7869.8 * pow(steering_angle, 5) - 17042 * pow(steering_angle, 4) - 1587 * pow(steering_angle, 3) + 3098 * pow(steering_angle, 2) + 2471.8 * steering_angle - 127.6;
+            m_steering.data = 196814 * pow(steering_angle, 6) + 50518 * pow(steering_angle, 5) - 47550 * pow(steering_angle, 4) - 5979.7 * pow(steering_angle, 3) + 2459.5 * pow(steering_angle, 2) + 2442.1 * steering_angle + 143.78;
             m_time_last = time_now;
             m_e_last = m_e;
 
@@ -181,9 +182,9 @@ int main(int argc, char** argv) {
     ros::Rate loop_rate(10);
     signal(SIGINT, signalHandler);
     while (ros::ok()) {
-        //controller.pidControl();
+        controller.pidControl();
         //controller.driveTrajectory();
-        controller.driveSteeringTest();
+        //controller.driveSteeringTest();
         if (stop_request) {
             controller.reset();
             ros::shutdown();
