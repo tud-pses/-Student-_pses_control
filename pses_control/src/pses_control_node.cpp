@@ -137,12 +137,20 @@ void PsesControl::pidControl() {
             double steering_angle = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
 
             // Limit for steering angle
-            if (steering_angle > 0.3316)
+            /*if (steering_angle > 0.3316)
             {
               steering_angle = 0.3316;
             }
             else if (steering_angle < -0.3374){
               steering_angle = -0.3374;
+            }*/
+
+            if (steering_angle > 0.290889)
+            {
+              steering_angle = 0.290889;
+            }
+            else if (steering_angle < -0.354883){
+              steering_angle = -0.354883;
             }
 
             //m_steering.data = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
