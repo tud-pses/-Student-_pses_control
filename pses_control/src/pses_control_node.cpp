@@ -66,15 +66,15 @@ void PsesControl::driveSteeringTest(){
 
 void PsesControl::driveTrajectory(){
     // Limit for steering angle
-    if (m_ack_steering > 0.3316)
+    if (m_ack_steering > 0.290889)
     {
-      m_ack_steering = 0.3316;
+      m_ack_steering = 0.290889;
     }
-    else if (m_ack_steering < -0.3374){
-      m_ack_steering = -0.3374;
+    else if (m_ack_steering < -0.354883){
+      m_ack_steering = -0.354883;
     }
 
-    if (m_ack_vel > 0.5)
+    /*if (m_ack_vel > 0.5)
     {
       m_velocity.data = 300;
     }
@@ -83,11 +83,17 @@ void PsesControl::driveTrajectory(){
     }
     else{
         m_velocity.data = m_ack_vel*600;
-    }
+    }*/
 
 
     //m_steering.data = m_kp * m_e + m_ki * dt * m_e_sum + m_kd * (m_e - m_e_last) / dt;
-    m_steering.data = 7869.8 * pow(m_ack_steering, 5) - 17042 * pow(m_ack_steering, 4) - 1587 * pow(m_ack_steering, 3) + 3098 * pow(m_ack_steering, 2) + 2471.8 * m_ack_steering - 127.6;
+    //m_steering.data = 7869.8 * pow(m_ack_steering, 5) - 17042 * pow(m_ack_steering, 4) - 1587 * pow(m_ack_steering, 3) + 3098 * pow(m_ack_steering, 2) + 2471.8 * m_ack_steering - 127.6;
+    m_steering.data = 196814 * pow(m_ack_steering, 6) + 50518 * pow(m_ack_steering, 5) - 47550 * pow(m_ack_steering, 4) - 5979.7 * pow(m_ack_steering, 3) + 2459.5 * pow(m_ack_steering, 2) + 2442.1 * m_ack_steering + 143.78;
+    if (m_ack_vel<0){
+        m_velocity.data=-300;
+    }
+    else{m_velocity.data=300;
+    }
     ROS_INFO("Ackermann Command2 : steering angle = %d - speed = %d", m_steering.data, m_velocity.data);
 
     m_pub_velocity.publish(m_velocity);
@@ -190,8 +196,8 @@ int main(int argc, char** argv) {
     ros::Rate loop_rate(10);
     signal(SIGINT, signalHandler);
     while (ros::ok()) {
-        controller.pidControl();
-        //controller.driveTrajectory();
+        //controller.pidControl();
+        controller.driveTrajectory();
         //controller.driveSteeringTest();
         if (stop_request) {
             controller.reset();

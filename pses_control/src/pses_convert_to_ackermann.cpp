@@ -41,6 +41,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "pses_convert_to_ackermann");
     ros::NodeHandle nh;
+    ros::Rate loop_rate(10);
     ros::Subscriber m_sub_ackermann = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, boost::bind(cmd_callback, _1));
     ros::Publisher m_pub_ackermann = nh.advertise<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 1);
     ros::Publisher m_pub_goal = nh.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1);
@@ -66,6 +67,7 @@ int main(int argc, char **argv)
         //nh.getParam("\frame_id", "odom");
 
         ros::spinOnce();
+        loop_rate.sleep();
     }
     ROS_INFO("Hello world!");
     return 0;

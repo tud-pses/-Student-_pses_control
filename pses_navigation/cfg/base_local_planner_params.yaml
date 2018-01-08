@@ -12,7 +12,6 @@
 #  holonomic_robot: false
 #  meter_scoring: true
 
-
 TebLocalPlannerROS:
 
  odom_topic: odom
@@ -88,10 +87,10 @@ TebLocalPlannerROS:
 
  # Homotopy Class Planner
 
- enable_homotopy_class_planning: True
+ enable_homotopy_class_planning: False
  enable_multithreading: True
  simple_exploration: False
- max_number_classes: 4
+ max_number_classes: 3
  roadmap_graph_no_samples: 15
  roadmap_graph_area_width: 5
  h_signature_prescaler: 0.5
