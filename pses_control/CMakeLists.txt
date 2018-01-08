@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
+find_package(OpenCV)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -105,9 +105,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES pses_control
-#  CATKIN_DEPENDS roscpp sensor_msgs std_msgs
+  CATKIN_DEPENDS roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
 
@@ -120,6 +120,19 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+)
+
+set(PERSON_FOLLOW_SOURCE_FILES
+  src/person_follow.cpp
+  src/person_follow_detection.cpp
+  src/person_follow_tracking.cpp
+  src/nms.cpp
+)
+
+set(PERSON_FOLLOW_HEADER_FILES
+  include/pses_control/person_follow_detection.hpp
+  include/pses_control/person_follow_tracking.hpp
+  include/pses_control/nms.hpp
 )
 
 ## Declare a C++ library
@@ -137,6 +150,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
   add_executable(${PROJECT_NAME}_node src/pses_control_node.cpp)
   add_executable(pses_convert_to_ackermann src/pses_convert_to_ackermann.cpp)
+  add_executable(person_follow ${PERSON_FOLLOW_SOURCE_FILES} ${PERSON_FOLLOW_HEADER_FILES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -149,6 +163,7 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_gencfg)
 add_dependencies(pses_convert_to_ackermann ${PROJECT_NAME}_gencfg)
+add_dependencies(person_follow ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
@@ -158,6 +173,10 @@ target_link_libraries(pses_convert_to_ackermann
    ${catkin_LIBRARIES}
 )
 
+target_link_libraries(person_follow
+   ${OpenCV_LIBS}
+   ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############
