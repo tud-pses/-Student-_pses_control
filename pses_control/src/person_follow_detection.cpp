@@ -48,8 +48,9 @@ void PersonFollowDetection::colorImageCallback(const sensor_msgs::ImageConstPtr&
         roi.height = rects_nms[i].height - rects_nms[i].y;
         roi.width = rects_nms[i].width - rects_nms[i].x;
         pub_bounding_box_.publish(roi);
+
+        rectangle(cv_ptr->image, Point(roi.x_offset, roi.y_offset + roi.height), Point(roi.x_offset + roi.width, roi.y_offset), Scalar(255, 0 ,0), 2);
     }
-    rectangle(cv_ptr->image, Scalar(255, 0 ,0), 2);
     imshow("OpenCV Video", cv_ptr->image);
     waitKey(1);
 }
