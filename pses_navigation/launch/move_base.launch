@@ -2,7 +2,7 @@
     <master auto="start"/>
 
     <!-- Run the map server -->
-     <arg name="pses_map" default="/home/pses/pses_map.yaml"/>
+     <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/pses_map_empty.yaml"/>
      <node name="map_server" pkg="map_server" type="map_server" args="$(arg pses_map)"/>
 
     <!--- Run AMCL-->

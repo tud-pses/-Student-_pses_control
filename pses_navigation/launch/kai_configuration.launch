@@ -4,8 +4,9 @@
         <arg name="camera_frame" default="camera_depth_frame"/>
 
         <!--Transform for cob_leg_detector-->
-        <node pkg="tf" type="static_transform_publisher" name="base_laser_broadcaster" args="0 0 0 0 0 0 1 base_laser camera_depth_frame 20" />
+        <node pkg="tf" type="static_transform_publisher" name="camera_depth_frame_broadcaster" args="0 0 0 0 0 0 1 base_laser camera_depth_frame 20" />
         <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 base_footprint base_link 20" />
+        <node pkg="tf" type="static_transform_publisher" name="base_laser_broadcaster" args="0 0 0 0 0 0 1 base_link base_laser 20" />
 
         <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
                 <remap from="camera_depth_frame" to="base_link"/>
@@ -22,11 +23,11 @@
     <node pkg="pses_control" type="pses_convert_to_ackermann" name="convert_to_ackermann" output="screen">
     </node>
 
-    <node pkg="pses_transform" type="pses_transform_tf_broadcaster" name="tf_broadcaster" output="screen">
+    <!--<node pkg="pses_transform" type="pses_transform_tf_broadcaster" name="tf_broadcaster" output="screen">
     </node>
 
     <node pkg="pses_transform" type="pses_transform_tf_listener" name="tf_listener" output="screen">
-    </node>
+    </node>-->
 
 
 </launch>
