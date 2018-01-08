@@ -8,31 +8,48 @@ PersonFollowDetection::PersonFollowDetection() {
     std::string color_image_topic;
     params.param<std::string>("color_image", color_image_topic, "/kinect2/hd/image");
     sub_color_image_ = nh.subscribe(color_image_topic, 50, &PersonFollowDetection::colorImageCallback, this);    // optimally image is resized
-    pub_bounding_box_ =nh.advertise<std_msgs::Int32MultiArray<sensor_msgs::RegionOfInterest>>("detect", 1);
+    pub_bounding_box_ = nh.advertise<sensor_msgs::RegionOfInterest>("detect", 1);
 
     // initialization
     hog_.setSVMDetector(HOGDescriptor::getDefaultPeopleDetector());
 }
 
-void PersonFollowDetection::colorImageCallback(const sensor_msgs::Image::ConstPtr& color_image) {
+void PersonFollowDetection::colorImageCallback(const sensor_msgs::ImageConstPtr& color_image) {
+    // copy ros image to opencv image type
+    cv_bridge::CvImagePtr cv_ptr;
+    try {
+        cv_ptr = cv_bridge::toCvCopy(color_image);
+    } catch (cv_bridge::Exception& e) {
+        ROS_ERROR("cv_bridge error: %s", e.what());
+        return;
+    }
+
     // detect people in image
-    vector<Rect> found, found_nms;
-    hog_.detectMultiScale(color_image, found, 0, Size(4, 4), Size(8, 8), 1.05, 2);
+    vector<Rect> found, rects_nms; // x, y, width, height
+    hog_.detectMultiScale(cv_ptr->image, found, 0, Size(4, 4), Size(8, 8), 1.05, 2, false);
 
     // apply faster non-maxima suppression
-    for (int i = 0; i < found.length(); ++i) {
-        found[i] = Rect(found[i].x, found[i].y, found[i].x + found[i].width, found[i].y + found[i].height);
+    vector<vector<float>> rects;
+    for (int i = 0; i < found.size(); ++i) {
+        vector<float> rect;
+        rect.push_back(found[i].x);
+        rect.push_back(found[i].y);
+        rect.push_back(found[i].x + found[i].width);
+        rect.push_back(found[i].y + found[i].height);
     }
-    found_nms = nms(found, 0.65);
-    ROS_INFO_STREAM("People in image found: " << found_nms.length());
+    rects_nms = nms(rects, 0.65);
+    ROS_INFO_STREAM("People in image found: " << rects_nms.size());
 
     // publish bounding box
-    geometry_msgs::Polygon bbox;
-    for (int i = 0; i < found.length(); ++i) {
-        geometry_msgs::Point32(found[i].x, found[i].y, 0);          // upper left
-        geometry_msgs::Point32(found[i].width, found[i].y, 0);      // upper right
-        geometry_msgs::Point32(found[i].width, found[i].height, 0); // lower right
-        geometry_msgs::Point32(found[i].x, found[i].height, 0);     // lower left
+    for (int i = 0; i < rects_nms.size(); ++i) {
+        sensor_msgs::RegionOfInterest roi;
+        roi.x_offset = rects_nms[i].x;
+        roi.y_offset = rects_nms[i].y;
+        roi.height = rects_nms[i].height - rects_nms[i].y;
+        roi.width = rects_nms[i].width - rects_nms[i].x;
+        pub_bounding_box_.publish(roi);
     }
-    pub_bounding_box_.publish();
+    rectangle(cv_ptr->image, Scalar(255, 0 ,0), 2);
+    imshow("OpenCV Video", cv_ptr->image);
+    waitKey(1);
 }

@@ -3,16 +3,19 @@
 
 #include <ros/ros.h>
 #include "sensor_msgs/Image.h"
-#include "std_msgs/Int32MultiArray.h"
-#include "sensor_msgs/RegionOfInterest.h>
+#include <sensor_msgs/RegionOfInterest.h>
 #include <std_msgs/String.h>
-#include "pses_control/nms.cpp"
+#include "nms.hpp"
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/core/version.hpp"
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
 
+using namespace cv;
+using namespace std;
 
 class PersonFollowDetection {
 
@@ -28,7 +31,7 @@ class PersonFollowDetection {
         ros::Publisher pub_bounding_box_;
 
         // Functions
-        void colorImageCallback(const sensor_msgs::Image::ConstPtr& color_image);
+        void colorImageCallback(const sensor_msgs::ImageConstPtr& color_image);
 
         // Variables
         sensor_msgs::Image color_image_;
