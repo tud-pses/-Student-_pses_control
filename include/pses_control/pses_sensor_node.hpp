@@ -3,9 +3,12 @@
 
 #include <std_msgs/String.h>
 #include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
+#include <pses_control/sensorConfig.h>
 #include <sensor_msgs/Range.h>
 #include <std_msgs/UInt8.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Int16.h>
 #include <stdlib.h>
 #include <math.h>
 #include <signal.h>
@@ -22,6 +25,9 @@ public:
 
     //Functions
     void calculateVelocity();
+    void reset();
+    void set_powertrain();
+
 
 
 private:
@@ -30,6 +36,9 @@ private:
     std_msgs::Float64 msg_hall_dt, msg_hall_dt8;
  //sensor_msgs::Range m_usr, m_usl, m_usf, m_usr_old, m_usl_old, m_usf_old;
     float velocity, tau;
+    std_msgs::Int16 target_speed, target_steering_angle;
+    dynamic_reconfigure::Server<pses_control::sensorConfig> server;
+
 
   // Subscriber
     //hall sensor
@@ -43,6 +52,8 @@ private:
 
   //Advertiser
  //   ros::Publisher pub_usr;
+    ros::Publisher m_pub_velocity;
+    ros::Publisher m_pub_steering;
   // Functions
     //hall sensor
     static void hall_cnt_Callback(std_msgs::UInt8::ConstPtr hall_cnt_msg, std_msgs::UInt8* m_hall_cnt);
@@ -54,6 +65,8 @@ private:
     static void usfCallback(sensor_msgs::Range::ConstPtr usfMsg, sensor_msgs::Range* m_usf);
 
     static float lowpass(float input, float output_old, float tau);
+    void param_callback(pses_control::sensorConfig &config, uint32_t level);
+
 
 
 

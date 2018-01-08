@@ -92,7 +92,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
  generate_dynamic_reconfigure_options(
    cfg/controller.cfg
-#   cfg/DynReconf2.cfg
+   cfg/sensor.cfg
  )
 
 ###################################

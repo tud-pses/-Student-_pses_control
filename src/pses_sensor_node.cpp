@@ -12,6 +12,14 @@ pses_sensor::pses_sensor() {          //Constructor
     sub_usl = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usl", 10, boost::bind(uslCallback, _1, &m_usl));
     sub_usf = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usf", 10, boost::bind(usfCallback, _1, &m_usf));
     pub_usr = nh.advertise<sensor_msgs::Range>("sensor/usr",10);
+
+    m_pub_velocity = nh.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
+    m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
+
+    dynamic_reconfigure::Server<pses_control::sensorConfig>::CallbackType f;
+    f = boost::bind(&pses_sensor::param_callback, this, _1, _2);
+    server.setCallback(f);
+
 }
 
 //Callback function for Hall_Counter
@@ -32,7 +40,6 @@ void pses_sensor::usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::
        float output_old = m_usr->range;
        *m_usr = *usrMsg;
        m_usr->range = pses_sensor::lowpass(usrMsg->range, output_old, 7.0);
-
     }
 }
 void pses_sensor::uslCallback(sensor_msgs::Range::ConstPtr uslMsg, sensor_msgs::Range* m_usl){
@@ -46,6 +53,13 @@ void pses_sensor::usfCallback(sensor_msgs::Range::ConstPtr usfMsg, sensor_msgs::
         }
 }
 
+//Callback function for dynamic reconfigure
+void pses_sensor::param_callback(pses_control::sensorConfig &config, uint32_t level) {
+  ROS_INFO("Reconfigure Request: %d %d", config.velocity, config.steering);
+  target_speed.data = config.velocity;
+  target_steering_angle.data = config.steering;
+}
+
 float pses_sensor::lowpass(float input, float output_old, float tau){
     return ((input+output_old*tau)/(tau+1));
 }
@@ -56,7 +70,17 @@ void pses_sensor::calculateVelocity(){
     ROS_INFO("Velocity: %f", velocity);
 }
 
+void pses_sensor::set_powertrain(){
+    m_pub_velocity.publish(target_speed);
+    m_pub_steering.publish(target_steering_angle);
+}
 
+void pses_sensor::reset(){
+    target_speed.data=0;
+    target_steering_angle.data=0;
+    m_pub_velocity.publish(target_speed);
+    m_pub_steering.publish(target_steering_angle);
+}
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "pses_sensor_node", ros::init_options::NoSigintHandler);
@@ -66,8 +90,11 @@ int main(int argc, char** argv) {
     while (ros::ok()) {
         sensornode.calculateVelocity();
         sensornode.pub_usr.publish(sensornode.m_usr);
+        sensornode.set_powertrain();
         ros::spinOnce();
         loop_rate.sleep();
     }
+    sensornode.reset();
+
     return 0;
 }
