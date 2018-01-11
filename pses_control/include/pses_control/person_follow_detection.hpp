@@ -8,14 +8,14 @@
 #include "nms.hpp"
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/image_encodings.h>
+#include <opencv2/dnn.hpp>
 
 using namespace cv;
 using namespace std;
+using namespace dnn;
 
 class PersonFollowDetection {
 
@@ -35,7 +35,9 @@ class PersonFollowDetection {
 
         // Variables
         sensor_msgs::Image color_image_;
-        HOGDescriptor hog_;
+        Net net_;
+        float confidence_thres_ = 0.8;
+        bool show_;
 };
 
 #endif // PERSON_FOLLOW_DETECTION_HPP

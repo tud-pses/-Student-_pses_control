@@ -2,16 +2,27 @@
 
 using namespace cv;
 using namespace std;
+using namespace dnn;
+
+/*
+ CLASSES = [ "background", "aeroplane", "bicycle", "bird", "boat",
+             "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+             "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+             "sofa", "train", "tvmonitor"]
+ */
 
 PersonFollowDetection::PersonFollowDetection() {
     ros::NodeHandle params("~");
     std::string color_image_topic;
     params.param<std::string>("color_image", color_image_topic, "/kinect2/hd/image");
+    params.param<bool>("show", show_, false);
     sub_color_image_ = nh.subscribe(color_image_topic, 50, &PersonFollowDetection::colorImageCallback, this);    // optimally image is resized
     pub_bounding_box_ = nh.advertise<sensor_msgs::RegionOfInterest>("detect", 1);
 
     // initialization
-    hog_.setSVMDetector(HOGDescriptor::getDefaultPeopleDetector());
+    String prototxt = "/home/pses/catkin_ws/src/pses_control/pses_control/data/MobileNetSSD_deploy.prototxt.txt";
+    String model = "/home/pses/catkin_ws/src/pses_control/pses_control/data/MobileNetSSD_deploy.caffemodel";
+    net_ = readNetFromCaffe(prototxt, model);
 }
 
 void PersonFollowDetection::colorImageCallback(const sensor_msgs::ImageConstPtr& color_image) {
@@ -23,40 +34,43 @@ void PersonFollowDetection::colorImageCallback(const sensor_msgs::ImageConstPtr&
         ROS_ERROR("cv_bridge error: %s", e.what());
         return;
     }
+    int image_width = cv_ptr->image.cols;
+    int image_height = cv_ptr->image.rows;
     Mat manip_image;
-    cvtColor(cv_ptr->image, manip_image, CV_BGR2GRAY);
-    equalizeHist(manip_image, manip_image);
+    Size manip_image_size(300, 300);
+    resize(cv_ptr->image, manip_image, manip_image_size);
+    Mat blob = blobFromImage(manip_image, 0.007843, manip_image_size, 127.5);
+    net_.setInput(blob);
+    Mat detections = net_.forward();
+    for (int i = 0; i < detections.size[2]; ++i) {
+        float confidence = detections.at<float>(Vec4i(0, 0, i, 2));
+        //Mat x = detections.reshape(1,1); // 0, id, %, x, y, widht, height
 
-    // detect people in image
-    vector<Rect> found, rects_nms; // x, y, width, height
-    hog_.detectMultiScale(manip_image, found, 0, Size(4, 4), Size(8, 8), 1.05, 2, false);
+        // if confidence of detected object is greater than threshold
+        // get only people detetions
+        // and compute bounding box
+        if (confidence > confidence_thres_) {
+            int idx = detections.at<float>(Vec4i(0, 0, i, 1));
+            if (idx == 15) {
+                Mat rect = (Mat_<float>(1,4 ) << detections.at<float>(Vec4i(0, 0, i, 3)), detections.at<float>(Vec4i(0, 0, i, 4)),
+                        detections.at<float>(Vec4i(0, 0, i, 5)), detections.at<float>(Vec4i(0, 0, i, 6)));
+                Mat scale = (Mat_<float>(1,4 ) << image_width, image_height, image_width, image_height);
+                Mat bbox(4, 1, CV_16UC1); bbox = rect.mul(scale);
+                rectangle(cv_ptr->image, Point(bbox.at<float>(0), bbox.at<float>(1)), Point(bbox.at<float>(2), bbox.at<float>(3)), Scalar(0, 255, 0), 2);
 
-    // apply faster non-maxima suppression
-    vector<vector<float>> rects;
-    //Mat img_copy; cv_ptr->image.copyTo(img_copy);
-    for (int i = 0; i < found.size(); ++i) {
-        vector<float> rect;
-        rect.push_back(found[i].x);
-        rect.push_back(found[i].y);
-        rect.push_back(found[i].x + found[i].width);
-        rect.push_back(found[i].y + found[i].height);
-        rects.push_back(rect);
-        //rectangle(img_copy, Point(found[i].x,found[i].y), Point(found[i].x + found[i].width,found[i].y + found[i].height), Scalar(0, 0, 255), 2);
+                // publish ROI based on bounding box
+                sensor_msgs::RegionOfInterest roi;
+                roi.x_offset = bbox.at<float>(0);
+                roi.y_offset = bbox.at<float>(1);
+                roi.height = bbox.at<float>(3) - bbox.at<float>(1);
+                roi.width = bbox.at<float>(2) - bbox.at<float>(0);
+                roi.do_rectify = false;
+                pub_bounding_box_.publish(roi);
+            }
+        }
     }
-    rects_nms = nms(rects, 0.65);
-    ROS_INFO_STREAM("People in image found: " << rects_nms.size());
-
-    // publish bounding box
-    for (int i = 0; i < rects_nms.size(); ++i) {
-        sensor_msgs::RegionOfInterest roi;
-        roi.x_offset = rects_nms[i].x;
-        roi.y_offset = rects_nms[i].y;
-        roi.height = rects_nms[i].height;
-        roi.width = rects_nms[i].width;
-        pub_bounding_box_.publish(roi);
-
-        rectangle(cv_ptr->image, Point(roi.x_offset, roi.y_offset + roi.height), Point(roi.x_offset + roi.width, roi.y_offset), Scalar(255, 0 ,0), 2);
+    if (show_) {
+        imshow("Detect", cv_ptr->image);
+        waitKey(1);
     }
-    imshow("OpenCV Video NMS", cv_ptr->image);
-    waitKey(1);
 }
