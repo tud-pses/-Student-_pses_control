@@ -15,6 +15,7 @@
       <rosparam file="$(find pses_navigation)/cfg/global_costmap_params.yaml" command="load" />
       <rosparam file="$(find pses_navigation)/cfg/base_local_planner_params.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+      <param name="controller_frequency" value="15.0"/>
     </node>
 
 </launch>
