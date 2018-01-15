@@ -40,6 +40,7 @@ private:
     dynamic_reconfigure::Server<pses_control::sensorConfig> server;
 
 
+
   // Subscriber
     //hall sensor
     ros::Subscriber sub_hall_counter;
@@ -70,6 +71,9 @@ private:
 
 
 
-
 };
+
+bool stop_request = false;
+void signalHandler(int sig);
+
 #endif //PSES_SENSOR_NODE_HPP

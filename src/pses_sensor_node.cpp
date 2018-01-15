@@ -65,32 +65,43 @@ float pses_sensor::lowpass(float input, float output_old, float tau){
 }
 //Outputs the Sensor Values and calculates the velocity
 void pses_sensor::calculateVelocity(){
-    ROS_INFO("Counter: %i, dt: %f, dt8: %f", msg_hall_counter.data, msg_hall_dt.data, msg_hall_dt8.data);
+    //ROS_INFO("Counter: %i, dt: %f, dt8: %f", msg_hall_counter.data, msg_hall_dt.data, msg_hall_dt8.data);
     velocity = msg_hall_dt.data * WHEEL_RADIUS * M_PI / 4;
-    ROS_INFO("Velocity: %f", velocity);
+   // ROS_INFO("Velocity: %f", velocity);
 }
 
 void pses_sensor::set_powertrain(){
+    //ROS_INFO("Reconfigure Request: %d %d", target_speed.data, target_steering_angle.data);
     m_pub_velocity.publish(target_speed);
     m_pub_steering.publish(target_steering_angle);
 }
 
 void pses_sensor::reset(){
+    ROS_INFO("Reset Sensor Node");
     target_speed.data=0;
     target_steering_angle.data=0;
     m_pub_velocity.publish(target_speed);
     m_pub_steering.publish(target_steering_angle);
 }
 
+void signalHandler(int sig) {
+    stop_request = true;
+}
+
 int main(int argc, char** argv) {
     ros::init(argc, argv, "pses_sensor_node", ros::init_options::NoSigintHandler);
     ros::NodeHandle _nh("~");	// use this for private params
-    ros::Rate loop_rate(100);
+    ros::Rate loop_rate(10);
     pses_sensor sensornode;
+    signal(SIGINT, signalHandler);
     while (ros::ok()) {
         sensornode.calculateVelocity();
         sensornode.pub_usr.publish(sensornode.m_usr);
         sensornode.set_powertrain();
+        if (stop_request) {
+            sensornode.reset();
+            ros::shutdown();
+        }
         ros::spinOnce();
         loop_rate.sleep();
     }
