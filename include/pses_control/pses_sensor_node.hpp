@@ -13,6 +13,9 @@
 #include <math.h>
 #include <signal.h>
 
+#define DRIVEN_DISTANCE_PER_TICK 0.0251327412 // RAD_PER_TICK * WHEEL_RADIUS
+#define WHEEL_RADIUS 6.5
+
 class pses_sensor {
 
 public:
@@ -27,15 +30,16 @@ public:
     void calculateVelocity();
     void reset();
     void set_powertrain();
-
+    void publish_sensor_data();
 
 
 private:
   // Variables
     std_msgs::UInt8 msg_hall_counter;
-    std_msgs::Float64 msg_hall_dt, msg_hall_dt8;
+    std_msgs::Float64 msg_hall_dt, msg_hall_dt8, velocity, avg_speed;
  //sensor_msgs::Range m_usr, m_usl, m_usf, m_usr_old, m_usl_old, m_usf_old;
-    float velocity, tau;
+    float tau;
+    int data_count;
     std_msgs::Int16 target_speed, target_steering_angle;
     dynamic_reconfigure::Server<pses_control::sensorConfig> server;
 
@@ -54,6 +58,9 @@ private:
  //   ros::Publisher pub_usr;
     ros::Publisher m_pub_velocity;
     ros::Publisher m_pub_steering;
+    ros::Publisher m_pub_speed;
+    ros::Publisher m_pub_avg_speed;
+    ros::Publisher m_pub_distance;
   // Functions
     //hall sensor
     static void hall_cnt_Callback(std_msgs::UInt8::ConstPtr hall_cnt_msg, std_msgs::UInt8* m_hall_cnt);
