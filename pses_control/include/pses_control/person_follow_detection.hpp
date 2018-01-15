@@ -21,20 +21,14 @@ class PersonFollowDetection {
 
     public:
         PersonFollowDetection();
-        ros::NodeHandle nh;
+        // Functions
+        Rect2d detect(Mat& color_image);
 
     private:
-        // Subscribers
-        ros::Subscriber sub_color_image_;
-
         // Publisher
-        ros::Publisher pub_bounding_box_;
-
-        // Functions
-        void colorImageCallback(const sensor_msgs::ImageConstPtr& color_image);
+        //ros::Publisher pub_bounding_box_;
 
         // Variables
-        sensor_msgs::Image color_image_;
         Net net_;
         float confidence_thres_ = 0.8;
         bool show_;
