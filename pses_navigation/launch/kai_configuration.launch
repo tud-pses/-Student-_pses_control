@@ -1,33 +1,14 @@
 <launch>
+    <!--Transform for cob_leg_detector  -->
+    <node pkg="tf" type="static_transform_publisher" name="base_laser_broadcaster" args="0.08 0 0.115 0 0 0 1 base_link base_laser 20" />
+    <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 base_footprint base_link 20" />
 
-        <arg name="depth_image" default="/kinect_utilities/depth_image_filtered"/>
-        <arg name="camera_frame" default="camera_depth_frame"/>
-
-        <!--Transform for cob_leg_detector-->
-        <node pkg="tf" type="static_transform_publisher" name="camera_depth_frame_broadcaster" args="0 0 0 0 0 0 1 base_laser camera_depth_frame 20" />
-        <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 base_footprint base_link 20" />
-        <node pkg="tf" type="static_transform_publisher" name="base_laser_broadcaster" args="0 0 0 0 0 0 1 base_link base_laser 20" />
-
-        <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
-                <remap from="camera_depth_frame" to="base_link"/>
-        </include>
-
-        <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
-                <remap from="image" to="$(arg depth_image)"/>
-        </node>
-
+    <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch"/>
 
     <node pkg="pses_odometry" type="odometry_node" name="odometry_node" output="screen">
     </node>
 
     <node pkg="pses_control" type="pses_convert_to_ackermann" name="convert_to_ackermann" output="screen">
     </node>
-
-    <!--<node pkg="pses_transform" type="pses_transform_tf_broadcaster" name="tf_broadcaster" output="screen">
-    </node>
-
-    <node pkg="pses_transform" type="pses_transform_tf_listener" name="tf_listener" output="screen">
-    </node>-->
-
 
 </launch>

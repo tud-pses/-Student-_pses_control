@@ -1,9 +1,10 @@
 <launch>
     <master auto="start"/>
     <arg name="depth_image" default="/kinect2/sd/image_depth_rect"/>
+
     <!-- Run the map server-->
-     <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/pses_map_empty.yaml"/>
-     <node name="map_server" pkg="map_server" type="map_server" args="$(arg pses_map)"/>
+    <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/pses_map_empty.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg pses_map)"/>
 
     <!-- Run AMCL-->
     <include file="$(find amcl)/examples/amcl_omni.launch" />
