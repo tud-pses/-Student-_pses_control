@@ -5,7 +5,6 @@
 #include "sensor_msgs/Image.h"
 #include <sensor_msgs/RegionOfInterest.h>
 #include <std_msgs/String.h>
-#include "nms.hpp"
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/imgproc/imgproc.hpp"
@@ -31,7 +30,7 @@ class PersonFollowDetection {
         // Variables
         Net net_;
         float confidence_thres_ = 0.8;
-        bool show_;
+        bool show_ = false;
 };
 
 #endif // PERSON_FOLLOW_DETECTION_HPP

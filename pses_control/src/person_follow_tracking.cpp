@@ -1,52 +1,56 @@
 #include "pses_control/person_follow_tracking.hpp"
 
 PersonFollowTracking::PersonFollowTracking() {
-    // List of tracker types in OpenCV 3.2
-    // NOTE : GOTURN implementation is buggy and does not work.
-    string trackerTypes[6] = {"BOOSTING", "MIL", "KCF", "TLD","MEDIANFLOW", "GOTURN"};
-    // vector <string> trackerTypes(types, std::end(types));
 
-    // Create a tracker
-    string trackerType = trackerTypes[2];
+}
+
+
+void PersonFollowTracking::initTracker(int tracking_id) {
+    tracking_id_ = tracking_id;
+    string trackerTypes[6] = {"BOOSTING", "MIL", "KCF", "TLD","MEDIANFLOW", "GOTURN"};
+    string trackerType = trackerTypes[tracking_id];
 
     #if (CV_MINOR_VERSION < 3)
     {
-        tracker = Tracker::create(trackerType);
+        tracker_ = Tracker::create(trackerType);
     }
     #else
     {
         if (trackerType == "BOOSTING")
-            tracker = TrackerBoosting::create();
+            tracker_ = TrackerBoosting::create();
         if (trackerType == "MIL")
-            tracker = TrackerMIL::create();
+            tracker_ = TrackerMIL::create();
         if (trackerType == "KCF")
-            tracker = TrackerKCF::create();
+            tracker_ = TrackerKCF::create();
         if (trackerType == "TLD")
-            tracker = TrackerTLD::create();
+            tracker_ = TrackerTLD::create();
         if (trackerType == "MEDIANFLOW")
-            tracker = TrackerMedianFlow::create();
+            tracker_ = TrackerMedianFlow::create();
         if (trackerType == "GOTURN")
-            tracker = TrackerGOTURN::create();
+            tracker_ = TrackerGOTURN::create();
     }
     #endif
 }
 
+void PersonFollowTracking::setInit(bool arg0) {
+    init_ = arg0;
+}
+
+
 Rect2d PersonFollowTracking::track(Mat& frame, Rect2d& bbox) {
 
-    if(!init) {
-        tracker->init(frame, bbox);
+    if(!init_) {
+        initTracker(tracking_id_);
+        tracker_->init(frame, bbox);
     }
-    string trackerTypes[6] = {"BOOSTING", "MIL", "KCF", "TLD","MEDIANFLOW", "GOTURN"};
-    string trackerType = trackerTypes[2];
 
     // Calculate Frames per second (FPS)
     double timer = (double)getTickCount();
+    init_ = tracker_->update(frame, bbox);
     float fps = getTickFrequency() / ((double)getTickCount() - timer);
 
-    init = tracker->update(frame, bbox);
-
     // Tracking success : Draw the tracked object
-    if (init)
+    if (init_)
     {
         rectangle(frame, bbox, Scalar( 255, 0, 0 ), 2, 1 );
     }
@@ -56,14 +60,13 @@ Rect2d PersonFollowTracking::track(Mat& frame, Rect2d& bbox) {
     }
 
     // Display tracker type on frame
-    putText(frame, trackerType + " Tracker", Point(100,20), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(50,170,50),2);
+    // putText(frame, trackerType + " Tracker", Point(100,20), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(50,170,50),2);
 
     // Display FPS on frame
     putText(frame, "FPS : " + SSTR(int(fps)), Point(100,50), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(50,170,50), 2);
 
     imshow("Tracking", frame);
     waitKey(1);
-
     return bbox;
 
 }

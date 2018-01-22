@@ -18,10 +18,13 @@ class PersonFollowTracking {
     public:
         PersonFollowTracking();
         Rect2d track(Mat& frame, Rect2d& bbox);
+        void initTracker(int tracking_id);
+        void setInit(bool arg0);
 
     private:
-        Ptr<Tracker> tracker;
-        bool init;
+        Ptr<Tracker> tracker_;
+        bool init_ = false;
+        int tracking_id_;
 
 };
 

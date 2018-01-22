@@ -128,13 +128,13 @@ set(PERSON_FOLLOW_SOURCE_FILES
   src/person_follow.cpp
   src/person_follow_detection.cpp
   src/person_follow_tracking.cpp
-  src/nms.cpp
+  src/person_follow_clustering.cpp
 )
 
 set(PERSON_FOLLOW_HEADER_FILES
   include/pses_control/person_follow_detection.hpp
   include/pses_control/person_follow_tracking.hpp
-  include/pses_control/nms.hpp
+  include/pses_control/person_follow_clustering.hpp
 )
 
 ## Declare a C++ library

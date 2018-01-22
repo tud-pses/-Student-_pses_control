@@ -12,6 +12,10 @@ using namespace dnn;
  */
 
 PersonFollowDetection::PersonFollowDetection() {
+    /*
+    ros::NodeHandle params("~");
+    params.param<bool>("show", show_, false);
+    */
     // initialization
     String prototxt = "/home/pses/catkin_ws/src/pses_control/pses_control/data/MobileNetSSD_deploy.prototxt.txt";
     String model = "/home/pses/catkin_ws/src/pses_control/pses_control/data/MobileNetSSD_deploy.caffemodel";
@@ -22,13 +26,13 @@ Rect2d PersonFollowDetection::detect(Mat& color_image) {
     // copy ros image to opencv image type and manipulate it
     int image_width = color_image.cols;
     int image_height = color_image.rows;
-    Mat manip_image;
-    Size manip_image_size(300, 300);
-    resize(color_image, manip_image, manip_image_size);
-    Mat blob = blobFromImage(manip_image, 0.007843, manip_image_size, 127.5);
+    Mat blob = blobFromImage(color_image, 0.007843, color_image.size(), 127.5);
     net_.setInput(blob);
     Mat detections = net_.forward();
-    Rect2d bbox(0.0 ,0.0 ,0.0 ,0.0);
+    Rect2d bbox(0.0, 0.0, 0.0, 0.0);
+    float best_confidence = 0.0;
+    //ROS_INFO_STREAM(detections.reshape(1, 1));
+
     for (int i = 0; i < detections.size[2]; ++i) {
         float confidence = detections.at<float>(Vec4i(0, 0, i, 2));
         //Mat x = detections.reshape(1,1); // 0, id, %, x, y, widht, height
@@ -37,26 +41,23 @@ Rect2d PersonFollowDetection::detect(Mat& color_image) {
         // get only people detetions
         // and compute bounding box
         if (confidence > confidence_thres_) {
+            ROS_INFO_STREAM(confidence);
             int idx = detections.at<float>(Vec4i(0, 0, i, 1));
-            if (idx == 15) {
+            if (idx == 15 && best_confidence < confidence) {
+                best_confidence = confidence;
                 Mat coords = (Mat_<float>(1,4 ) << detections.at<float>(Vec4i(0, 0, i, 3)), detections.at<float>(Vec4i(0, 0, i, 4)),
                         detections.at<float>(Vec4i(0, 0, i, 5)), detections.at<float>(Vec4i(0, 0, i, 6)));
                 Mat scale = (Mat_<float>(1,4 ) << image_width, image_height, image_width, image_height);
-                Mat rect(4, 1, CV_64FC1); rect = coords.mul(scale);
-                rectangle(color_image, Point(rect.at<float>(0), rect.at<float>(1)), Point(rect.at<float>(2), rect.at<float>(3)), Scalar(0, 255, 0), 2);
-                bbox = Rect2d(Point(rect.at<double>(0),rect.at<double>(1)),Point(rect.at<double>(2),rect.at<double>(3)));
-                // publish ROI based on bounding box
-                /*sensor_msgs::RegionOfInterest roi;
-                roi.x_offset = bbox.at<float>(0);
-                roi.y_offset = bbox.at<float>(1);
-                roi.height = bbox.at<float>(3) - bbox.at<float>(1);
-                roi.width = bbox.at<float>(2) - bbox.at<float>(0);
-                roi.do_rectify = false;
-                pub_bounding_box_.publish(roi);*/
+                Mat rect(4, 1, CV_64FC1);
+                rect = coords.mul(scale);
+                bbox = Rect2d(Point(rect.at<float>(0),rect.at<float>(1)),Point(rect.at<float>(2),rect.at<float>(3)));
+                rectangle(color_image, bbox, Scalar(0, 255, 0), 2);
+                ROS_INFO_STREAM(bbox);
             }
         }
     }
-    if (show_) {
+
+    if (true) {
         imshow("Detect", color_image);
         waitKey(1);
     }
