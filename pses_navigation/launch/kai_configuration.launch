@@ -11,4 +11,7 @@
     <node pkg="pses_control" type="pses_convert_to_ackermann" name="convert_to_ackermann" output="screen">
     </node>
 
+    <node pkg="pses_control" type="pses_trajectory" name="pses_trajectory" output="screen">
+    </node>
+
 </launch>
