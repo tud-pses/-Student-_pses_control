@@ -52,10 +52,9 @@ int main(int argc, char **argv)
         //nh.getParam("\ackermann_cmd_topic", ackermann_cmd_topic);
         //nh.getParam("\wheelbase", 1.0);
         //nh.getParam("\frame_id", "odom");
-
+        m_pub_ackermann.publish(ack_msg);
         ros::spinOnce();
         loop_rate.sleep();
     }
-    ROS_INFO("Hello world!");
     return 0;
 } 

@@ -19,4 +19,7 @@
       <param name="controller_frequency" value="15.0"/>
     </node>
 
+        <!--<node pkg="pses_control" type="pses_trajectory" name="pses_trajectory" output="screen">
+        </node> -->
+
 </launch>

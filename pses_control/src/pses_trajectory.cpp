@@ -17,7 +17,7 @@ PsesTrajectory::PsesTrajectory() {
 
 void PsesTrajectory::ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double* m_ack_steering, double* m_ack_vel)
 {
-    ROS_INFO("Ackermann Command : steering angle = %f - speed = %f", ackermannCmdMsg->drive.steering_angle, ackermannCmdMsg->drive.speed);
+    //ROS_INFO("Ackermann Command : steering angle = %f - speed = %f", ackermannCmdMsg->drive.steering_angle, ackermannCmdMsg->drive.speed);
     *m_ack_steering=ackermannCmdMsg->drive.steering_angle;
     *m_ack_vel=ackermannCmdMsg->drive.speed;
 }
@@ -31,7 +31,7 @@ void PsesTrajectory::publishGoal(){
     geometry_msgs::PoseStamped goal_msg;
     goal_msg.header.stamp = ros::Time::now();
     goal_msg.header.frame_id = "map";
-    goal_msg.pose.position.x = 5;
+    goal_msg.pose.position.x = 1.5;
     goal_msg.pose.position.y = 0;
     goal_msg.pose.position.z = 0;
     goal_msg.pose.orientation.x = 0;
@@ -86,8 +86,8 @@ void PsesTrajectory::driveTrajectory(){
 
     //ROS_INFO("Ackermann Command2 : steering angle = %d - speed = %d", m_steering.data, m_velocity.data);
 
-    //m_pub_velocity.publish(m_velocity);
-    //m_pub_steering.publish(m_steering);
+    m_pub_velocity.publish(m_velocity);
+    m_pub_steering.publish(m_steering);
     publishGoal();
 }
 
