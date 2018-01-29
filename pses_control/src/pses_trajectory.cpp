@@ -31,7 +31,7 @@ void PsesTrajectory::publishGoal(){
     geometry_msgs::PoseStamped goal_msg;
     goal_msg.header.stamp = ros::Time::now();
     goal_msg.header.frame_id = "map";
-    goal_msg.pose.position.x = 1.5;
+    goal_msg.pose.position.x = 5;
     goal_msg.pose.position.y = 0;
     goal_msg.pose.position.z = 0;
     goal_msg.pose.orientation.x = 0;
