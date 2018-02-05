@@ -3,7 +3,7 @@
     <arg name="depth_image" default="/kinect2/sd/image_depth_rect"/>
 
     <!-- Run the map server-->
-    <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/room_door_open_original.yaml"/>
+    <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/room_door_closed.yaml"/>
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg pses_map)"/>
 
     <!-- Run AMCL-->
