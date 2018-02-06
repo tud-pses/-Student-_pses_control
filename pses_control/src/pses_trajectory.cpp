@@ -84,7 +84,7 @@ void PsesTrajectory::driveTrajectory(){
         m_velocity.data = 0;
     }
 
-    //ROS_INFO("Ackermann Command2 : steering angle = %d - speed = %d", m_steering.data, m_velocity.data);
+    ROS_INFO("steerings : steering_real = %d - steering_ack = %f", m_steering.data, m_ack_steering);
 
     m_pub_velocity.publish(m_velocity);
     m_pub_steering.publish(m_steering);
