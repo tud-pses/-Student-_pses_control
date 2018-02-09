@@ -50,7 +50,7 @@ void PsesControl::driveSteeringTest(){
     m_steering.data = m_steering_config.data;
     m_velocity.data = 300;
 
-    m_pub_velocity.publish(m_velocity);
+    //m_pub_velocity.publish(m_velocity);
     m_pub_steering.publish(m_steering);
 
 }
@@ -151,8 +151,8 @@ int main(int argc, char** argv) {
     ros::Rate loop_rate(10);
     signal(SIGINT, signalHandler);
     while (ros::ok()) {
-        controller.pidControl();
-        //controller.driveSteeringTest();
+        //controller.pidControl();
+        controller.driveSteeringTest();
         if (stop_request) {
             controller.reset();
             ros::shutdown();
