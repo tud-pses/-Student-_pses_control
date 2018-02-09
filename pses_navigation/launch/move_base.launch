@@ -1,6 +1,11 @@
 <launch>
     <master auto="start"/>
-    <arg name="depth_image" default="/kinect2/sd/image_depth_rect"/>
+
+    <arg name="depth_image" default="/kinect_utilities/depth_image_filtered"/>
+
+    <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
+            <remap from="image" to="$(arg depth_image)"/>
+    </node>
 
     <!-- Run the map server-->
     <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/pses_map_empty.yaml"/>
