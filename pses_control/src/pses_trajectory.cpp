@@ -45,12 +45,12 @@ void PsesTrajectory::publishGoal(){
 void PsesTrajectory::driveTrajectory(){
 
     // Limit for steering angle
-    if (m_ack_steering > 0.290889)
+    if (m_ack_steering < -0.290889)
     {
-      m_ack_steering = 0.290889;
+      m_ack_steering = -0.290889;
     }
-    else if (m_ack_steering < -0.354883){
-      m_ack_steering = -0.354883;
+    else if (m_ack_steering > 0.354883){
+      m_ack_steering = 0.354883;
     }
 
     /*if (m_ack_vel > 0.5)
@@ -65,7 +65,7 @@ void PsesTrajectory::driveTrajectory(){
     }*/
 
     //m_steering.data = 7869.8 * pow(m_ack_steering, 5) - 17042 * pow(m_ack_steering, 4) - 1587 * pow(m_ack_steering, 3) + 3098 * pow(m_ack_steering, 2) + 2471.8 * m_ack_steering - 127.6;
-    m_steering.data = 196814 * pow(m_ack_steering, 6) + 50518 * pow(m_ack_steering, 5) - 47550 * pow(m_ack_steering, 4) - 5979.7 * pow(m_ack_steering, 3) + 2459.5 * pow(m_ack_steering, 2) + 2442.1 * m_ack_steering + 143.78;
+    m_steering.data = (196814 * pow(m_ack_steering, 6) - 50518 * pow(m_ack_steering, 5) - 47550 * pow(m_ack_steering, 4) + 5979.7 * pow(m_ack_steering, 3) + 2459.5 * pow(m_ack_steering, 2) - 2442.1 * m_ack_steering + 143.78);
 
     //Velocity
     if (m_ack_vel < - 0.825872){
@@ -74,7 +74,7 @@ void PsesTrajectory::driveTrajectory(){
     else if (m_ack_vel > 2.013835){
         m_velocity.data=1000;
     }
-    else if (m_ack_vel <= 0 && m_ack_vel > - 0.825872){
+    else if (m_ack_vel < 0 && m_ack_vel >= - 0.825872){
         m_velocity.data=477.52 * m_ack_vel - 104.62;
     }
     else if (m_ack_vel <= 2.013835 && m_ack_vel > 0){
@@ -84,7 +84,7 @@ void PsesTrajectory::driveTrajectory(){
         m_velocity.data = 0;
     }
 
-    ROS_INFO("steerings : steering_real = %d - steering_ack = %f", m_steering.data, m_ack_steering);
+    ROS_INFO("velocities : velocity_real = %d - velocity_ack = %f", m_velocity.data, m_ack_vel);
 
     m_pub_velocity.publish(m_velocity);
     m_pub_steering.publish(m_steering);
