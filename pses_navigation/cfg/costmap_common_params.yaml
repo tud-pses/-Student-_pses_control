@@ -3,6 +3,14 @@ raytrace_range: 5.5
 footprint: [[-0.18, 0.105], [0.18, 0.105], [0.18,-0.105], [-0.18, -0.105]]
 #robot_radius: ir_of_robot
 inflation_radius: 0.05
+map_type: costmap
 observation_sources: laser_scan_sensor
+
+obstacle_layer:
+ track_unknown_space: false
+
+static layer:
+  enabled: true
+  map_topic: "/map"
 
 laser_scan_sensor: {sensor_frame: base_laser, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
