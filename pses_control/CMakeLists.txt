@@ -94,6 +94,7 @@ find_package(OpenCV)
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
  generate_dynamic_reconfigure_options(
    cfg/controller.cfg
+   cfg/person_follow.cfg
 #   cfg/DynReconf2.cfg
  )
 

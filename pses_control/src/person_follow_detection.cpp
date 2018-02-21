@@ -58,6 +58,15 @@ Rect2d PersonFollowDetection::detect(Mat& color_image) {
     }
 
     if (true) {
+        /*int x_new = bbox.x * 960.0/300.0;
+        int height_new = bbox.height * 540.0/300.0;
+        int y_new = bbox.y * 540.0/300.0;
+        int width_new = bbox. width * 960.0/300.0;
+        Rect2d bbox_new(x_new, y_new, width_new, height_new);
+        Mat manip_image;
+        resize(color_image, manip_image, Size(960,540));
+        rectangle(manip_image, bbox_new, Scalar(0, 255, 0), 2);*/
+
         imshow("Detect", color_image);
         waitKey(1);
     }
