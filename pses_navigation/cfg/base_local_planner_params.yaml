@@ -47,7 +47,7 @@ TebLocalPlannerROS:
 
  min_turning_radius: 0.67        # Min turning radius of the carlike robot (compute value using a model or adjust with rqt_reconfigure manually)
  wheelbase: 0.25                 # Wheelbase of our robot
- cmd_angle_instead_rotvel: True # stage simulator takes the angle instead of the rotvel as input (twist message)
+ cmd_angle_instead_rotvel: False # stage simulator takes the angle instead of the rotvel as input (twist message)
 
 
  # GoalTolerance
@@ -84,6 +84,9 @@ TebLocalPlannerROS:
  weight_obstacle: 50
  weight_dynamic_obstacle: 10 # not in use yet
  selection_alternative_time_cost: False # not in use yet
+
+ global_plan_viapoint_sep: 0.1
+ weight_viapoint: 200
 
  # Homotopy Class Planner
 

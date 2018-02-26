@@ -23,7 +23,7 @@
       <rosparam file="$(find pses_navigation)/cfg/base_global_planner_params.yaml" command="load" />
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
       <param name="base_global_planner" value="navfn/NavfnROS" />
-      <param name="controller_frequency" value="15.0"/>
+      <param name="controller_frequency" value="5.0"/>
     </node>
 
         <!--<node pkg="pses_control" type="pses_trajectory" name="pses_trajectory" output="screen">
