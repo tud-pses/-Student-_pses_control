@@ -2,40 +2,29 @@
 #include <cmath>
 
 PersonFollowClustering::PersonFollowClustering() {
-    offset_ = 0;
-
 }
 
-void PersonFollowClustering::scanCallback(const sensor_msgs::LaserScan::ConstPtr& scan) {
-    scan_ = *scan;
-}
-
-void PersonFollowClustering::setOffset(int value) {
-    offset_ = value;
-}
-
-sensor_msgs::LaserScan PersonFollowClustering::cluster(int left, int right) {
-    //std_msgs::Float32MultiArray ranges;
-    int idx = 0;
-    /*for (int i = left; i < right + 1; i++) {
-        ranges.data.push_back(scan_.ranges[i]);
-        ++idx;
+void PersonFollowClustering::depthImageCallback(const sensor_msgs::ImageConstPtr& depth_image) {
+    cv_bridge::CvImagePtr cv_ptr;
+    try {
+        cv_ptr = cv_bridge::toCvCopy(depth_image, sensor_msgs::image_encodings::TYPE_32FC1);
+        Size manip_size(300, 300);
+        resize(cv_ptr->image, manip_depth_image, manip_size);
+    } catch (cv_bridge::Exception& e) {
+        ROS_ERROR("cv_bridge error: %s", e.what());
+        // return;
     }
-    return ranges;*/
+}
 
-    sensor_msgs::LaserScan sub_scan(scan_);
+void PersonFollowClustering::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& points) {
 
+}
 
-    //Test
-    int left_new = scan_.ranges.size()-right;
-    int right_new = scan_.ranges.size()-left;
-
-    //ROS_INFO_STREAM(scan_.angle_min << scan_.angle_max);
-    //ROS_INFO_STREAM(scan_.angle_increment);
-    ROS_INFO_STREAM(left << " - " << right);
-    for (int i = 0; i < scan_.ranges.size(); i++) {
-        if (i < left_new - offset_ || i > right_new - offset_)
-            sub_scan.ranges[i]=7.0;
-    }
-    return sub_scan;
+void PersonFollowClustering::cluster(Rect2d& bbox) {
+    Mat bbox_image = manip_depth_image(bbox);
+    float mean_bbox = mean(bbox_image)[0];
+    Mat mask;
+    threshold(bbox_image, mask, mean_bbox, 1, THRESH_BINARY_INV);
+    mask.convertTo(mask, CV_8UC1);
+    float mean_distance = mean(bbox_image, mask)[0];
 }

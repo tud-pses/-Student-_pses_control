@@ -3,8 +3,9 @@
 
 #include <ros/ros.h>
 #include "opencv2/opencv.hpp"
-#include <sensor_msgs/LaserScan.h>
-#include <std_msgs/Float32MultiArray.h>
+#include "sensor_msgs/Image.h"
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/PointCloud2.h>
 
 using namespace cv;
 using namespace std;
@@ -13,15 +14,12 @@ class PersonFollowClustering {
 
     public:
         PersonFollowClustering();
-        void scanCallback(const sensor_msgs::LaserScan::ConstPtr& scan);
-        sensor_msgs::LaserScan cluster(int left, int right);
-        void setOffset(int value);
-
+        void depthImageCallback(const sensor_msgs::ImageConstPtr& depth_image);
+        void pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& points);
+        void cluster(Rect2d& bbox);
 
     private:
-        sensor_msgs::LaserScan scan_;
-        int offset_;
-
+        Mat manip_depth_image;
 
 };
 
