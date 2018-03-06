@@ -23,8 +23,6 @@ public:
 
     // Variables
     ros::NodeHandle nh;	// use this for global access
-    ros::Publisher pub_usr;
-    sensor_msgs::Range m_usr, m_usl, m_usf, m_usr_old, m_usl_old, m_usf_old;
 
     //Functions
     void calculateVelocity();
@@ -36,8 +34,8 @@ public:
 private:
   // Variables
     std_msgs::UInt8 msg_hall_counter;
-    std_msgs::Float64 msg_hall_dt, msg_hall_dt8, velocity, avg_speed;
- //sensor_msgs::Range m_usr, m_usl, m_usf, m_usr_old, m_usl_old, m_usf_old;
+    std_msgs::Float64 msg_hall_dt, msg_hall_dt8, velocity, driven_distance, avg_speed;
+    sensor_msgs::Range m_usr, m_usl, m_usf, m_usr_old, m_usl_old, m_usf_old;
     float tau;
     int data_count;
     std_msgs::Int16 target_speed, target_steering_angle;
@@ -55,13 +53,15 @@ private:
     ros::Subscriber sub_usl;
     ros::Subscriber sub_usf;
 
-  //Advertiser
- //   ros::Publisher pub_usr;
-    ros::Publisher m_pub_velocity;
+ //Advertiser
+  //ros::Publisher pub_usr;
+    ros::Publisher m_pub_motor_speed;
     ros::Publisher m_pub_steering;
-    ros::Publisher m_pub_speed;
+
+    ros::Publisher m_pub_velocity;
     ros::Publisher m_pub_avg_speed;
     ros::Publisher m_pub_distance;
+    ros::Publisher pub_usr;
   // Functions
     //hall sensor
     static void hall_cnt_Callback(std_msgs::UInt8::ConstPtr hall_cnt_msg, std_msgs::UInt8* m_hall_cnt);
