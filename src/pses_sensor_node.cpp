@@ -9,7 +9,7 @@ pses_sensor::pses_sensor() {          //Constructor
     sub_hall_dt     = nh.subscribe<std_msgs::Float64>("/uc_bridge/hall_dt", 10, boost::bind(hall_dt_Callback, _1, &msg_hall_dt));
     sub_hall_dt8    = nh.subscribe<std_msgs::Float64>("/uc_bridge/hall_dt8", 10, boost::bind(hall_dt8_Callback, _1, &msg_hall_dt8));
     // subscribers for ultra sonic range sensors
-    sub_usr = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usr", 10, boost::bind(usrCallback, _1, &m_usr));
+    sub_usr = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usr", 10, boost::bind(usrCallback, _1, &m_usr, &tau));
     sub_usl = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usl", 10, boost::bind(uslCallback, _1, &m_usl));
     sub_usf = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usf", 10, boost::bind(usfCallback, _1, &m_usf));
 
@@ -45,11 +45,11 @@ void pses_sensor::hall_dt8_Callback(std_msgs::Float64::ConstPtr hall_dt8_msg, st
 }
 
 //Callback functions for ultra sonic sensor
-void pses_sensor::usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::Range* m_usr){
+void pses_sensor::usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::Range* m_usr, float* tau){
     if(usrMsg->range != 0){
        float output_old = m_usr->range;
        *m_usr = *usrMsg;
-       m_usr->range = pses_sensor::lowpass(usrMsg->range, output_old, 7.0);
+       m_usr->range = pses_sensor::lowpass(usrMsg->range, output_old, *tau);
     }
 }
 void pses_sensor::uslCallback(sensor_msgs::Range::ConstPtr uslMsg, sensor_msgs::Range* m_usl){
@@ -65,9 +65,10 @@ void pses_sensor::usfCallback(sensor_msgs::Range::ConstPtr usfMsg, sensor_msgs::
 
 //Callback function for dynamic reconfigure
 void pses_sensor::param_callback(pses_control::sensorConfig &config, uint32_t level) {
-  ROS_INFO("Reconfigure Request: %d %d", config.velocity, config.steering);
+  ROS_INFO("Reconfigure Request:\n Velocity: %d \n Steering: %d \n tau: %f", config.velocity, config.steering, config.tau);
   target_speed.data = config.velocity;
   target_steering_angle.data = config.steering;
+  tau = config.tau;
 }
 
 //lowpass filter function

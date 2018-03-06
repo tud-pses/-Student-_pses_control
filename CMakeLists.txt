@@ -148,7 +148,7 @@ include_directories(
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(pses_control_node pses_control_gencfg)
-add_dependencies(pses_sensor_node pses_sensor_gencfg)
+add_dependencies(pses_sensor_node pses_control_gencfg)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(pses_control_node ${catkin_LIBRARIES})
