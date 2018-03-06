@@ -7,12 +7,14 @@ PsesTrajectory::PsesTrajectory() {
     m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
 
     m_sub_ackermann_cmd = nh.subscribe<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 10, boost::bind(ackermannCmdCallback, _1, &m_ack_steering, &m_ack_vel));
-    m_sub_follow_goal = nh.subscribe<geometry_msgs::PoseStamped>("/follow_goal", 10, boost::bind(followGoalCallback, _1,&m_follow_goal));
+    //m_sub_follow_goal = nh.subscribe<geometry_msgs::PoseStamped>("/follow_goal", 10, boost::bind(followGoalCallback, _1,&m_follow_goal));
+    m_sub_amcl_pose = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 10, boost::bind(amclPoseCallback, _1, &m_amcl_pose));
     m_pub_goal = nh.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal",1);
 
     dynamic_reconfigure::Server<pses_control::controllerConfig>::CallbackType f;
     f = boost::bind(&PsesTrajectory::paramCallback, this, _1, _2);
     m_server.setCallback(f);
+    m_goal_counter=0;
 }
 
 void PsesTrajectory::ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double* m_ack_steering, double* m_ack_vel)
@@ -22,24 +24,69 @@ void PsesTrajectory::ackermannCmdCallback(const ackermann_msgs::AckermannDriveSt
     *m_ack_vel=ackermannCmdMsg->drive.speed;
 }
 
-void PsesTrajectory::followGoalCallback(const geometry_msgs::PoseStamped::ConstPtr& followGoalMsg, geometry_msgs::PoseStamped* m_follow_goal){
+/*void PsesTrajectory::followGoalCallback(const geometry_msgs::PoseStamped::ConstPtr& followGoalMsg, geometry_msgs::PoseStamped* m_follow_goal){
     *m_follow_goal = *followGoalMsg;
+}*/
+
+void PsesTrajectory::amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& amcl_pose, geometry_msgs::PoseWithCovarianceStamped* m_amcl_pose){
+    *m_amcl_pose = *amcl_pose;
 }
 
 void PsesTrajectory::publishGoal(){
+    double goal_orient_z, goal_orient_w, distance_to_goal;
+    double pose_pos_x, pose_pos_y;
 
-    geometry_msgs::PoseStamped goal_msg;
-    goal_msg.header.stamp = ros::Time::now();
-    goal_msg.header.frame_id = "map";
-    goal_msg.pose.position.x = 5;
-    goal_msg.pose.position.y = 0;
-    goal_msg.pose.position.z = 0;
-    goal_msg.pose.orientation.x = 0;
-    goal_msg.pose.orientation.y = 0;
-    goal_msg.pose.orientation.z = 0;
-    goal_msg.pose.orientation.w = 1;
+    pose_pos_x = m_amcl_pose.pose.pose.position.x;
+    pose_pos_y = m_amcl_pose.pose.pose.position.y;
 
-    m_pub_goal.publish(goal_msg);
+    if (m_goal_counter == 0){
+        distance_to_goal = 0;
+    }
+    else{
+        distance_to_goal = sqrt(pow((m_goal_pos_x-pose_pos_x),2)+pow((m_goal_pos_y-pose_pos_y),2));
+    }
+
+    ROS_INFO("pose x : %f - pose y : %f - distance : %f - goal_pose_x : %f - goal_pos_y : %f", pose_pos_x, pose_pos_y, distance_to_goal, m_goal_pos_x, m_goal_pos_y);
+
+    if (distance_to_goal < 0.5){
+        ROS_INFO("counter: %d", m_goal_counter);
+        switch (m_goal_counter) { //EXAMPLES
+        case 0:
+             m_goal_pos_x = 2.0;
+             m_goal_pos_y = 0.0;
+             goal_orient_z = 0.0;
+             goal_orient_w = 1.0;
+             sleep(2);
+             break;
+        case 1:
+            m_goal_pos_x = 4.0;
+            m_goal_pos_y = 0.0;
+            goal_orient_z = 0.0;
+            goal_orient_w = 1.0;
+            break;
+        default: //TODO
+            stop_request = true;
+            m_goal_pos_x = pose_pos_x;
+            m_goal_pos_y = pose_pos_y;
+            goal_orient_z = 0.0;
+            goal_orient_w = 1.0;
+            break;
+        }
+        geometry_msgs::PoseStamped goal_msg;
+        goal_msg.header.stamp = ros::Time::now();
+        goal_msg.header.frame_id = "map";
+        goal_msg.pose.position.x = m_goal_pos_x;
+        goal_msg.pose.position.y = m_goal_pos_y;
+        goal_msg.pose.position.z = 0.0;
+        goal_msg.pose.orientation.x = 0.0;
+        goal_msg.pose.orientation.y = 0.0;
+        goal_msg.pose.orientation.z = goal_orient_z;
+        goal_msg.pose.orientation.w = goal_orient_w;
+
+        m_pub_goal.publish(goal_msg);
+
+        m_goal_counter++;
+    }
 }
 
 void PsesTrajectory::driveTrajectory(){
@@ -84,11 +131,10 @@ void PsesTrajectory::driveTrajectory(){
         m_velocity.data = 0;
     }
 
-    ROS_INFO("velocities : velocity_real = %d - velocity_ack = %f", m_velocity.data, m_ack_vel);
+    //ROS_INFO("velocities : velocity_real = %d - velocity_ack = %f", m_velocity.data, m_ack_vel);
 
-    m_pub_velocity.publish(m_velocity);
-    m_pub_steering.publish(m_steering);
-    //publishGoal();
+    //m_pub_velocity.publish(m_velocity);
+    //m_pub_steering.publish(m_steering);
 }
 
 void PsesTrajectory::reset() {
@@ -122,6 +168,7 @@ int main(int argc, char** argv) {
     signal(SIGINT, signalHandler);
 
     while (ros::ok()) {
+        controller.publishGoal();
         controller.driveTrajectory();
         if (stop_request) {
             controller.reset();
