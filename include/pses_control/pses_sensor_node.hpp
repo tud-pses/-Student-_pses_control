@@ -9,6 +9,7 @@
 #include <std_msgs/UInt8.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Int16.h>
+#include <geometry_msgs/TwistWithCovarianceStamped.h>
 #include <stdlib.h>
 #include <math.h>
 #include <signal.h>
@@ -39,8 +40,9 @@ private:
     float tau;
     int data_count;
     std_msgs::Int16 target_speed, target_steering_angle;
+    std_msgs::Int16 msg_motor_speed;
     dynamic_reconfigure::Server<pses_control::sensorConfig> server;
-
+    geometry_msgs::TwistWithCovarianceStamped wheel_odom;
 
 
   // Subscriber
@@ -52,6 +54,7 @@ private:
     ros::Subscriber sub_usr;
     ros::Subscriber sub_usl;
     ros::Subscriber sub_usf;
+    ros::Subscriber m_sub_motor_speed;
 
  //Advertiser
   //ros::Publisher pub_usr;
@@ -62,6 +65,7 @@ private:
     ros::Publisher m_pub_avg_speed;
     ros::Publisher m_pub_distance;
     ros::Publisher pub_usr;
+    ros::Publisher m_pub_wheel_odom;
   // Functions
     //hall sensor
     static void hall_cnt_Callback(std_msgs::UInt8::ConstPtr hall_cnt_msg, std_msgs::UInt8* m_hall_cnt);
@@ -71,6 +75,7 @@ private:
     static void usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::Range* m_usr, float* tau);
     static void uslCallback(sensor_msgs::Range::ConstPtr uslMsg, sensor_msgs::Range* m_usl);
     static void usfCallback(sensor_msgs::Range::ConstPtr usfMsg, sensor_msgs::Range* m_usf);
+    static void motor_speed_Callback(std_msgs::Int16::ConstPtr motor_speed_msg, std_msgs::Int16* msg_motor_speed);
 
     static float lowpass(float input, float output_old, float tau);
     void param_callback(pses_control::sensorConfig &config, uint32_t level);
