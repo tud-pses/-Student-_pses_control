@@ -50,17 +50,59 @@ void PsesTrajectory::publishGoal(){
 
     if (distance_to_goal < 0.5){
         ROS_INFO("counter: %d", m_goal_counter);
-        switch (m_goal_counter) { //EXAMPLES
+        switch (m_goal_counter) {
         case 0:
-             m_goal_pos_x = 2.0;
-             m_goal_pos_y = 0.0;
+             m_goal_pos_x = 20.0;
+             m_goal_pos_y = 0.6;
              goal_orient_z = 0.0;
              goal_orient_w = 1.0;
              sleep(2);
              break;
         case 1:
-            m_goal_pos_x = 4.0;
-            m_goal_pos_y = 0.0;
+            m_goal_pos_x = 27.75;
+            m_goal_pos_y = 1.0;
+            goal_orient_z = 0.0;
+            goal_orient_w = 1.0;
+            break;
+        case 2:
+            m_goal_pos_x = 27.9;
+            m_goal_pos_y = -2.5;
+            goal_orient_z = -0.707;
+            goal_orient_w = 0.707;
+            break;
+        case 3:
+            m_goal_pos_x = 27.75;
+            m_goal_pos_y = -6.5;
+            goal_orient_z = -0.707;
+            goal_orient_w = 0.707;
+            break;
+        case 4:
+            m_goal_pos_x = 23.5;
+            m_goal_pos_y = -7.4;
+            goal_orient_z = 1.0;
+            goal_orient_w = 0.0;
+            break;
+        case 5:
+            m_goal_pos_x = 15.2;
+            m_goal_pos_y = -7.6;
+            goal_orient_z = 1.0;
+            goal_orient_w = 0.0;
+            break;
+        case 6:
+            m_goal_pos_x = 12.2;
+            m_goal_pos_y = -6.8;
+            goal_orient_z = 0.707;
+            goal_orient_w = 0.707;
+            break;
+        case 7:
+            m_goal_pos_x = 13.25;
+            m_goal_pos_y = 0.2;
+            goal_orient_z = 0.0;
+            goal_orient_w = 1.0;
+            break;
+        case 8:
+            m_goal_pos_x = 22.5;
+            m_goal_pos_y = 0.8;
             goal_orient_z = 0.0;
             goal_orient_w = 1.0;
             break;
@@ -133,8 +175,8 @@ void PsesTrajectory::driveTrajectory(){
 
     //ROS_INFO("velocities : velocity_real = %d - velocity_ack = %f", m_velocity.data, m_ack_vel);
 
-    //m_pub_velocity.publish(m_velocity);
-    //m_pub_steering.publish(m_steering);
+    m_pub_velocity.publish(m_velocity);
+    m_pub_steering.publish(m_steering);
 }
 
 void PsesTrajectory::reset() {
