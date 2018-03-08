@@ -11,6 +11,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <pses_control/controllerConfig.h>
 #include <math.h>
+#include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
@@ -56,6 +57,7 @@ private:
     void paramCallback(pses_control::controllerConfig &config, uint32_t level);
     static void ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double *m_ack_steering, double *m_ack_vel);
     static void amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& amcl_pose, geometry_msgs::PoseWithCovarianceStamped *m_amcl_pose);
+    static void cmdCallback(const geometry_msgs::Twist::ConstPtr& data, double* m_ack_steering, double* m_ack_vel);
     //static void followGoalCallback(const geometry_msgs::PoseStamped::ConstPtr& followGoalMsg, geometry_msgs::PoseStamped *m_follow_goal);
 
 };

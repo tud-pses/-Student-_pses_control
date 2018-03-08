@@ -6,7 +6,8 @@ PsesTrajectory::PsesTrajectory() {
     m_pub_velocity = nh.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
     m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
 
-    m_sub_ackermann_cmd = nh.subscribe<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 10, boost::bind(ackermannCmdCallback, _1, &m_ack_steering, &m_ack_vel));
+    //m_sub_ackermann_cmd = nh.subscribe<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 10, boost::bind(ackermannCmdCallback, _1, &m_ack_steering, &m_ack_vel));
+    m_sub_ackermann_cmd = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 10, boost::bind(cmdCallback, _1, &m_ack_steering, &m_ack_vel));
     //m_sub_follow_goal = nh.subscribe<geometry_msgs::PoseStamped>("/follow_goal", 10, boost::bind(followGoalCallback, _1,&m_follow_goal));
     m_sub_amcl_pose = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 10, boost::bind(amclPoseCallback, _1, &m_amcl_pose));
     m_pub_goal = nh.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal",1);
@@ -16,12 +17,18 @@ PsesTrajectory::PsesTrajectory() {
     m_server.setCallback(f);
     m_goal_counter=0;
 }
-
+/*
 void PsesTrajectory::ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double* m_ack_steering, double* m_ack_vel)
 {
     //ROS_INFO("Ackermann Command : steering angle = %f - speed = %f", ackermannCmdMsg->drive.steering_angle, ackermannCmdMsg->drive.speed);
     *m_ack_steering=ackermannCmdMsg->drive.steering_angle;
     *m_ack_vel=ackermannCmdMsg->drive.speed;
+}
+*/
+void PsesTrajectory::cmdCallback(const geometry_msgs::Twist::ConstPtr& data, double* m_ack_steering, double* m_ack_vel){
+  *m_ack_steering = data->angular.z;
+  *m_ack_vel = data->linear.x;
+
 }
 
 /*void PsesTrajectory::followGoalCallback(const geometry_msgs::PoseStamped::ConstPtr& followGoalMsg, geometry_msgs::PoseStamped* m_follow_goal){
