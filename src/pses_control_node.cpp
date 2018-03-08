@@ -7,7 +7,7 @@ PsesControl::PsesControl() {
     m_pub_velocity = nh.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
     m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
 
-    m_sub_usr = nh.subscribe<sensor_msgs::Range>("/sensor/usr", 10, boost::bind(usrCallback, _1, &m_usr));
+    m_sub_usr = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usr", 10, boost::bind(usrCallback, _1, &m_usr));
     m_sub_usl = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usl", 10, boost::bind(uslCallback, _1, &m_usl));
     m_sub_usf = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usf", 10, boost::bind(usfCallback, _1, &m_usf));
 
@@ -41,7 +41,7 @@ void PsesControl::usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::
 }
 
 void PsesControl::paramCallback(pses_control::controllerConfig &config, uint32_t level){
-    ROS_INFO("Reconfigure Request: %f %f %f %f %i", config.target_value, config.kp, config.ki, config.kd, config.velocity);
+    ROS_INFO("Reconfigure Request: \n Target Value %f \n KP: %f \n Ki: %f \n kd: %f \n Velocity %i", config.target_value, config.kp, config.ki, config.kd, config.velocity);
     m_target_value = config.target_value;
     m_kp = config.kp;
     m_ki = config.ki;
@@ -56,8 +56,10 @@ void PsesControl::pidControl() {
     {
         if (m_usl.range <= 0.1)
         {
+           // ROS_INFO("USL SCHLEIFE");
             m_velocity.data = 0;
         } else {
+           // ROS_INFO("PID SCHLEIFE");
             m_velocity.data = m_velocity_config.data;
 
             /* compute closest distance from front corner to wall */
@@ -93,11 +95,13 @@ void PsesControl::pidControl() {
             }
         }
     }
+   // ROS_INFO("M_Velocity: %i", m_velocity.data);
     m_pub_velocity.publish(m_velocity);
     m_pub_steering.publish(m_steering);
 }
 
 void PsesControl::reset() {
+    ROS_INFO("Reset pses_control_node");
     m_velocity.data = 0;
     m_steering.data = 0;
     m_pub_velocity.publish(m_velocity);

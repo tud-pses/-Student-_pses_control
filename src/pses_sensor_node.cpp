@@ -15,8 +15,8 @@ pses_sensor::pses_sensor() {          //Constructor
     sub_usf = nh.subscribe<sensor_msgs::Range>("/uc_bridge/usf", 10, boost::bind(usfCallback, _1, &m_usf));
 
     pub_usr = nh.advertise<sensor_msgs::Range>("/sensornode/usr",10);
-    m_pub_motor_speed = nh.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
-    m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
+    //m_pub_motor_speed = nh.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
+    //m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
 
     //publisher of velocity data
     m_pub_velocity = nh. advertise<std_msgs::Float64>("/sensornode/velocity",10);
@@ -117,8 +117,8 @@ void pses_sensor::publish_sensor_data(){
 }
 
 void pses_sensor::set_powertrain(){
-    m_pub_motor_speed.publish(target_speed);
-    m_pub_steering.publish(target_steering_angle);
+    //m_pub_motor_speed.publish(target_speed);
+   // m_pub_steering.publish(target_steering_angle);
 }
 
 //resets the car's actuators to default values in case of abort of the main loop
