@@ -55,7 +55,7 @@ void PsesTrajectory::publishGoal(){
 
     ROS_INFO("pose x : %f - pose y : %f - distance : %f - goal_pose_x : %f - goal_pos_y : %f", pose_pos_x, pose_pos_y, distance_to_goal, m_goal_pos_x, m_goal_pos_y);
 
-    if (distance_to_goal < 0.5){
+    if (distance_to_goal < 1){
         ROS_INFO("counter: %d", m_goal_counter);
         switch (m_goal_counter) {
         case 0:
@@ -66,7 +66,7 @@ void PsesTrajectory::publishGoal(){
              sleep(2);
              break;
         case 1:
-            m_goal_pos_x = 27.75;
+            m_goal_pos_x = 26.5;
             m_goal_pos_y = 1.0;
             goal_orient_z = 0.0;
             goal_orient_w = 1.0;
