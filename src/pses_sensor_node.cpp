@@ -107,10 +107,12 @@ void pses_sensor::calculateVelocity(){
 }
 
 void pses_sensor::publish_sensor_data(){
-    pub_usr.publish(m_usr);
-    m_pub_velocity.publish(velocity);
-   // m_pub_distance.publish(driven_distance);
+   pub_usr.publish(m_usr);
+   m_pub_velocity.publish(velocity);
+   m_pub_distance.publish(driven_distance);
    wheel_odom.twist.twist.linear.x = velocity.data;
+   wheel_odom.header.frame_id = "base_link";
+   wheel_odom.header.stamp = ros::Time::now();
    m_pub_wheel_odom.publish(wheel_odom);
 }
 
