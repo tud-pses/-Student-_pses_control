@@ -48,9 +48,9 @@ void PsesControl::usrCallback(sensor_msgs::Range::ConstPtr usrMsg, sensor_msgs::
 
 void PsesControl::driveSteeringTest(){
     m_steering.data = m_steering_config.data;
-    m_velocity.data = 300;
+    m_velocity.data = m_velocity_config.data;
 
-    //m_pub_velocity.publish(m_velocity);
+    m_pub_velocity.publish(m_velocity);
     m_pub_steering.publish(m_steering);
 
 }
