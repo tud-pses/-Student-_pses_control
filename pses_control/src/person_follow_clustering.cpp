@@ -20,7 +20,7 @@ void PersonFollowClustering::pointCloudCallback(const sensor_msgs::PointCloud2::
 
 }
 
-geometry_msgs::PoseStamped PersonFollowClustering::cluster(Rect2d& bbox) {
+geometry_msgs::PoseStamped PersonFollowClustering::cluster(Rect2d& bbox, double distance_to_person) {
     //cv::Mat h = (cv::Mat_<double>(3, 3) << 366.7218933105469, 0.0, 259.8772888183594, 0.0, 366.7218933105469, 203.314697265625, 0.0, 0.0, 1.0);
     cv::Mat h = (cv::Mat_<double>(3, 3) << 529.9732789120519, 0.0, 477.4416333879422, 0.0, 526.9663404399863, 261.8692914553029, 0.0, 0.0, 1.0);
 
@@ -37,12 +37,16 @@ geometry_msgs::PoseStamped PersonFollowClustering::cluster(Rect2d& bbox) {
     cv::Mat pt = (cv::Mat_<double>(3, 1) << v_, u_, 1.0);
     pt = h.inv() * pt * mean_distance/1000.0;
 
+    double dist_eukl = sqrt(pow(pt.at<double>(0),2)+pow(pt.at<double>(2),2));
+
+
+
     geometry_msgs::PoseStamped target;
     target.header.stamp = ros::Time::now();
     target.header.frame_id = "camera_depth_frame";
-    target.pose.position.x = pt.at<double>(0);//1000.0;
-    target.pose.position.y = pt.at<double>(1);//1000.0;
-    target.pose.position.z = pt.at<double>(2);//1000.0;
+    target.pose.position.x = pt.at<double>(0) * (1.0 - distance_to_person/dist_eukl);
+    target.pose.position.y = pt.at<double>(1);
+    target.pose.position.z = pt.at<double>(2) * (1.0 - distance_to_person/dist_eukl);
     target.pose.orientation.x = 0;
     target.pose.orientation.y = 0;
     target.pose.orientation.z = 0;

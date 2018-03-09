@@ -20,6 +20,7 @@ ros::Subscriber sub_depth_image_;
 ros::Publisher pub_target_;
 int tracking_id_;
 int cnt_ = 0;
+double distance_to_person_;
 
 void detectOrTrack(Mat frame) {
     ++cnt_;
@@ -36,7 +37,7 @@ void detectOrTrack(Mat frame) {
         if(bbox_.x > 31 && bbox_.x + bbox_.width < 228) {
             if (bbox_.y < 0) bbox_.y = 0;
             if (bbox_.y + bbox_.height > 300) bbox_.height = 300 - bbox_.y;
-            geometry_msgs::PoseStamped target = cluster_.cluster(bbox_);
+            geometry_msgs::PoseStamped target = cluster_.cluster(bbox_, distance_to_person_);
             pub_target_.publish(target);
         }
     }
@@ -57,6 +58,7 @@ void colorImageCallback(const sensor_msgs::ImageConstPtr& color_image) {
 }
 
 void reconfigureCallback(pses_control::person_followConfig &config, uint32_t level) {
+    distance_to_person_ = config.distance;
 }
 
 int main(int argc, char** argv) {
