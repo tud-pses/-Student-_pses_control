@@ -13,11 +13,13 @@ TebLocalPlannerROS:
  feasibility_check_no_poses: 5
 
  # Robot
- max_vel_x: 0.8
+ max_vel_x: 0.5
  max_vel_x_backwards: 0.4
- max_vel_theta: 0.2
- acc_lim_x: 0.4
- acc_lim_theta: 0.2
+ max_vel_y: 0.0
+ acc_vel_y: 0.0
+ max_vel_theta: 1.0
+ acc_lim_x: 2.0
+ acc_lim_theta: 1.0
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "polygon"
    vertices: [ [-0.18, 0.105], [0.18, 0.105], [0.18,-0.105], [-0.18, -0.105] ] # for type "polygon"
@@ -43,7 +45,8 @@ TebLocalPlannerROS:
 
  # Optimization
 
- weight_max_vel_x: 300
+ weight_max_vel_x: 2.0
+ weight_kinematics_forward_drive: 100
 
  # Homotopy Class Planner
 
