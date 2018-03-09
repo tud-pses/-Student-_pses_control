@@ -8,6 +8,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <dynamic_reconfigure/server.h>
 #include "pses_control/person_followConfig.h"
+#include "geometry_msgs/PoseStamped.h"
 
 PersonFollowDetection detector_;
 PersonFollowTracking tracker_;
@@ -16,6 +17,7 @@ Rect2d bbox_;
 ros::Subscriber sub_color_image_;
 ros::Subscriber sub_point_cloud_;
 ros::Subscriber sub_depth_image_;
+ros::Publisher pub_target_;
 int tracking_id_;
 int cnt_ = 0;
 
@@ -34,7 +36,8 @@ void detectOrTrack(Mat frame) {
         if(bbox_.x > 31 && bbox_.x + bbox_.width < 228) {
             if (bbox_.y < 0) bbox_.y = 0;
             if (bbox_.y + bbox_.height > 300) bbox_.height = 300 - bbox_.y;
-            cluster_.cluster(bbox_);
+            geometry_msgs::PoseStamped target = cluster_.cluster(bbox_);
+            pub_target_.publish(target);
         }
     }
 }
@@ -72,6 +75,7 @@ int main(int argc, char** argv) {
     sub_color_image_ = nh_.subscribe(color_image, 10, &colorImageCallback);
     sub_point_cloud_ = nh_.subscribe("/kinect2/qhd/points", 10, &PersonFollowClustering::pointCloudCallback, &cluster_);
     sub_depth_image_ = nh_.subscribe("/kinect2/qhd/image_depth_rect", 10, &PersonFollowClustering::depthImageCallback, &cluster_);
+    pub_target_ = nh_.advertise<geometry_msgs::PoseStamped>("person_target", 1);
 
     ros::Rate loop_rate(10);
     while (ros::ok()) { //node_obj.nh.ok()

@@ -6,6 +6,7 @@
 #include "sensor_msgs/Image.h"
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/PointCloud2.h>
+#include "geometry_msgs/PoseStamped.h"
 
 using namespace cv;
 using namespace std;
@@ -16,10 +17,11 @@ class PersonFollowClustering {
         PersonFollowClustering();
         void depthImageCallback(const sensor_msgs::ImageConstPtr& depth_image);
         void pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& points);
-        void cluster(Rect2d& bbox);
+        geometry_msgs::PoseStamped cluster(Rect2d& bbox);
 
     private:
         Mat manip_depth_image;
+
 
 };
 
