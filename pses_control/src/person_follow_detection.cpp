@@ -17,8 +17,8 @@ PersonFollowDetection::PersonFollowDetection() {
     params.param<bool>("show", show_, false);
     */
     // initialization
-    String prototxt = "/home/garwin/catkin_ws/src/pses_control/pses_control/data/MobileNetSSD_deploy.prototxt.txt";
-    String model = "/home/garwin/catkin_ws/src/pses_control/pses_control/data/MobileNetSSD_deploy.caffemodel";
+    String prototxt = "/home/pses/catkin_ws/src/pses_control/pses_control/data/MobileNetSSD_deploy.prototxt.txt";
+    String model = "/home/pses/catkin_ws/src/pses_control/pses_control/data/MobileNetSSD_deploy.caffemodel";
     net_ = readNetFromCaffe(prototxt, model);
 }
 
