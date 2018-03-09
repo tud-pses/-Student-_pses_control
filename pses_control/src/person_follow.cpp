@@ -13,6 +13,7 @@
 PersonFollowDetection detector_;
 PersonFollowTracking tracker_;
 PersonFollowClustering cluster_;
+PersonFollowControl control_;
 Rect2d bbox_;
 ros::Subscriber sub_color_image_;
 ros::Subscriber sub_point_cloud_;
