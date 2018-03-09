@@ -66,7 +66,7 @@ void PsesTrajectory::publishGoal(){
              sleep(2);
              break;
         case 1:
-            m_goal_pos_x = 26.5;
+            m_goal_pos_x = 25.5;
             m_goal_pos_y = 1.0;
             goal_orient_z = 0.0;
             goal_orient_w = 1.0;
@@ -79,7 +79,7 @@ void PsesTrajectory::publishGoal(){
             break;
         case 3:
             m_goal_pos_x = 27.75;
-            m_goal_pos_y = -5.5;
+            m_goal_pos_y = -5.0;
             goal_orient_z = -0.707;
             goal_orient_w = 0.707;
             break;
@@ -90,14 +90,14 @@ void PsesTrajectory::publishGoal(){
             goal_orient_w = 0.0;
             break;
         case 5:
-            m_goal_pos_x = 15.2;
+            m_goal_pos_x = 14.5;
             m_goal_pos_y = -7.6;
             goal_orient_z = 1.0;
             goal_orient_w = 0.0;
             break;
         case 6:
-            m_goal_pos_x = 13.36;
-            m_goal_pos_y = -6.1;
+            m_goal_pos_x = 12.9;
+            m_goal_pos_y = -4.5;
             goal_orient_z = 0.707;
             goal_orient_w = 0.707;
             break;
@@ -108,8 +108,8 @@ void PsesTrajectory::publishGoal(){
             goal_orient_w = 0.707;
             break;
         case 8:
-            m_goal_pos_x = 22.5;
-            m_goal_pos_y = 0.8;
+            m_goal_pos_x = 20.0;
+            m_goal_pos_y = 0.6;
             goal_orient_z = 0.0;
             goal_orient_w = 1.0;
             break;
