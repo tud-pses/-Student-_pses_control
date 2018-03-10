@@ -65,8 +65,8 @@ Rect2d PersonFollowTracking::track(Mat& frame, Rect2d& bbox) {
     // Display FPS on frame
     putText(frame, "FPS : " + SSTR(int(fps)), Point(100,50), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(50,170,50), 2);
 
-    imshow("Tracking", frame);
-    waitKey(1);
+    //imshow("Tracking", frame);
+    //waitKey(1);
     return bbox;
 
 }

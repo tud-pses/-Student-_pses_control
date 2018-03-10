@@ -25,6 +25,11 @@ geometry_msgs::PoseStamped PersonFollowClustering::cluster(Rect2d& bbox, double 
     cv::Mat h = (cv::Mat_<double>(3, 3) << 529.9732789120519, 0.0, 477.4416333879422, 0.0, 526.9663404399863, 261.8692914553029, 0.0, 0.0, 1.0);
 
     Mat bbox_image = manip_depth_image(bbox);
+    for(int i =0; i < bbox_image.rows; i++) {
+        for(int n=0; n < bbox_image.cols; n++) {
+            if(bbox_image.at<float>(i,n)<100.0) bbox_image.at<float>(i,n)=7000.0;
+        }
+    }
     float mean_bbox = mean(bbox_image)[0];
     Mat mask;
     threshold(bbox_image, mask, mean_bbox, 1, THRESH_BINARY_INV);
@@ -52,9 +57,11 @@ geometry_msgs::PoseStamped PersonFollowClustering::cluster(Rect2d& bbox, double 
     target.pose.orientation.z = 0;
     target.pose.orientation.w = 1;
 
-    ROS_INFO_STREAM("Pixel: " << u_ << " - " << v_);
+    //ROS_INFO_STREAM("Pixel: " << u_ << " - " << v_);
     ROS_INFO_STREAM("Abstand: " << mean_distance);
     ROS_INFO_STREAM("Koordinaten: " << target.pose.position);
+    //imshow("Maske", mask*255);
+    //waitKey(1);
 
     return target;
 }

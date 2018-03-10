@@ -67,8 +67,8 @@ Rect2d PersonFollowDetection::detect(Mat& color_image) {
         resize(color_image, manip_image, Size(960,540));
         rectangle(manip_image, bbox_new, Scalar(0, 255, 0), 2);*/
 
-        imshow("Detect", color_image);
-        waitKey(1);
+        //imshow("Detect", color_image);
+        //waitKey(1);
     }
 
     return bbox;

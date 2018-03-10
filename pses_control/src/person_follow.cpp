@@ -10,6 +10,7 @@
 #include <dynamic_reconfigure/server.h>
 #include "pses_control/person_followConfig.h"
 #include "geometry_msgs/PoseStamped.h"
+#include "std_msgs/Int16.h"
 
 PersonFollowDetection detector_;
 PersonFollowTracking tracker_;
@@ -20,12 +21,16 @@ ros::Subscriber sub_color_image_;
 ros::Subscriber sub_point_cloud_;
 ros::Subscriber sub_depth_image_;
 ros::Publisher pub_target_;
+ros::Publisher pub_steering_;
+ros::Publisher pub_velocity_;
 int tracking_id_;
 int cnt_ = 0;
 double distance_to_person_;
+ros::Time controller_timeout_;
 
 void detectOrTrack(Mat frame) {
     ++cnt_;
+    std_msgs::Int16 steering_msg, velocity_msg;
     if(bbox_.tl() == bbox_.br() || cnt_ > 100) {
         ROS_INFO_STREAM("detecting...");
         bbox_ = detector_.detect(frame);
@@ -34,15 +39,27 @@ void detectOrTrack(Mat frame) {
     } else {
         ROS_INFO_STREAM("tracking...");
         bbox_ = tracker_.track(frame, bbox_);
-    }
-    if (bbox_.tl() != bbox_.br()) {
-        if(bbox_.x > 31 && bbox_.x + bbox_.width < 228) {
-            if (bbox_.y < 0) bbox_.y = 0;
-            if (bbox_.y + bbox_.height > 300) bbox_.height = 300 - bbox_.y;
+
+        if(bbox_.x + 0.5*bbox_.width > 31 && bbox_.x + bbox_.width*0.5 < 228) {
+            if(bbox_.x < 32) bbox_.x = 32;
+            if(bbox_.x + bbox_.width > 228) bbox_.width = 228 - bbox_.x;
+            if(bbox_.y < 0) bbox_.y = 0;
+            if(bbox_.y + bbox_.height > 300) bbox_.height = 300 - bbox_.y;
             geometry_msgs::PoseStamped target = cluster_.cluster(bbox_, distance_to_person_);
             pub_target_.publish(target);
+            float steering, velocity;
+            controller_timeout_ = ros::Time::now();
+            control_.control(target, steering, velocity);
+            steering_msg.data = steering;
+            velocity_msg.data = velocity;
         }
     }
+    if (ros::Time::now().toSec() - controller_timeout_.toSec() > 3.0) {
+        steering_msg.data = 0;
+        velocity_msg.data = 0;
+    }
+    pub_steering_.publish(steering_msg);
+    pub_velocity_.publish(velocity_msg);
 }
 
 void colorImageCallback(const sensor_msgs::ImageConstPtr& color_image) {
@@ -61,6 +78,7 @@ void colorImageCallback(const sensor_msgs::ImageConstPtr& color_image) {
 
 void reconfigureCallback(pses_control::person_followConfig &config, uint32_t level) {
     distance_to_person_ = config.distance;
+    control_.setGains(config.kp_steering, config.kd_steering, config.kp_velocity, config.kd_velocity);
 }
 
 int main(int argc, char** argv) {
@@ -80,6 +98,8 @@ int main(int argc, char** argv) {
     sub_point_cloud_ = nh_.subscribe("/kinect2/qhd/points", 10, &PersonFollowClustering::pointCloudCallback, &cluster_);
     sub_depth_image_ = nh_.subscribe("/kinect2/qhd/image_depth_rect", 10, &PersonFollowClustering::depthImageCallback, &cluster_);
     pub_target_ = nh_.advertise<geometry_msgs::PoseStamped>("person_target", 1);
+    pub_steering_ = nh_.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
+    pub_velocity_ = nh_.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
 
     ros::Rate loop_rate(10);
     while (ros::ok()) { //node_obj.nh.ok()
