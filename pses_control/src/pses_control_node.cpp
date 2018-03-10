@@ -1,5 +1,5 @@
-//#include "pses_control/pses_control_node.hpp"
-#include </home/pses/catkin_ws/src/pses_control/pses_control/include/pses_control/pses_control_node.hpp>
+#include "pses_control/pses_control_node.hpp"
+//#include </home/pses/catkin_ws/src/pses_control/pses_control/include/pses_control/pses_control_node.hpp>
 
 
 PsesControl::PsesControl() {
