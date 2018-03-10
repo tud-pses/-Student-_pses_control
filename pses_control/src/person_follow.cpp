@@ -3,6 +3,7 @@
 #include "pses_control/person_follow_detection.hpp"
 #include "pses_control/person_follow_tracking.hpp"
 #include "pses_control/person_follow_clustering.hpp"
+#include "pses_control/person_follow_control.hpp"
 #include "sensor_msgs/Image.h"
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/PointCloud2.h>

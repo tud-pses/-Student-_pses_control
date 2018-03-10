@@ -4,7 +4,7 @@
 PersonFollowControl::PersonFollowControl() {
 }
 
-void PersonFollowClustering::setGains(double kp_steering, double kd_steering, double kp_velocity, double kd_velocity) {
+void PersonFollowControl::setGains(double kp_steering, double kd_steering, double kp_velocity, double kd_velocity) {
     kp_steering_ = kp_steering;
     kd_steering_ = kd_steering;
     kp_velocity_ = kp_velocity;
@@ -12,7 +12,7 @@ void PersonFollowClustering::setGains(double kp_steering, double kd_steering, do
 
 }
 
-void PersonFollowClustering::control() {
+void PersonFollowControl::control() {
     double steering;
     double velocity;
 }
