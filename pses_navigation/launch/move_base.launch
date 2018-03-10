@@ -8,7 +8,7 @@
     </node>
 
     <!-- Run the map server-->
-    <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/map.yaml"/>
+    <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/map2.yaml"/>
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg pses_map)"/>
 
     <!-- Run AMCL-->
@@ -21,10 +21,12 @@
       <rosparam file="$(find pses_navigation)/cfg/global_costmap_params.yaml" command="load" />
       <rosparam file="$(find pses_navigation)/cfg/base_local_planner_params.yaml" command="load" />
       <rosparam file="$(find pses_navigation)/cfg/base_global_planner_params.yaml" command="load" />
-      <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
       <param name="base_global_planner" value="navfn/NavfnROS" />
+      <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
       <param name="controller_frequency" value="10.0"/>
       <param name="agressive_reset" value="clear_costmap_recovery/ClearCostmapRecovery"/>
+      <param name="clear_rotation_allowed" value="false"/>
+      <!--<param name="max_planning_retries" value="5"/>-->
     </node>
 
         <!--<node pkg="pses_control" type="pses_trajectory" name="pses_trajectory" output="screen">
