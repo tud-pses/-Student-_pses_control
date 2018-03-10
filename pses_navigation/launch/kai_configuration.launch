@@ -1,0 +1,16 @@
+<launch>
+    <!--Transform for cob_leg_detector  -->
+    <node pkg="tf" type="static_transform_publisher" name="base_laser_broadcaster" args="0.08 0 0.115 0 0 0 1 base_link base_laser 20" />
+    <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 base_footprint base_link 20" />
+    <node pkg="tf" type="static_transform_publisher" name="base_camera_depth_frame_broadcaster" args="0 0 0 0 0 0 1 base_laser camera_depth_frame 20" />
+    <node pkg="tf" type="static_transform_publisher" name="base_laser_broadcaster2" args="0 0 0 0 0 0 1 base_laser front_sensor 20" />
+
+    <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch"/>
+
+    <node pkg="pses_odometry" type="odometry_node" name="odometry_node" output="screen">
+    </node>
+
+    <node pkg="pses_control" type="pses_convert_to_ackermann" name="convert_to_ackermann" output="screen">
+    </node>
+
+</launch>

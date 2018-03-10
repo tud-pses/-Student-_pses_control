@@ -1,0 +1,33 @@
+<launch>
+    <master auto="start"/>
+
+    <arg name="depth_image" default="/kinect_utilities/depth_image_filtered"/>
+
+    <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
+            <remap from="image" to="$(arg depth_image)"/>
+    </node>
+
+    <!-- Run the map server-->
+    <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/map.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg pses_map)"/>
+
+    <!-- Run AMCL-->
+    <include file="$(find amcl)/examples/amcl_diff.launch" />
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+      <rosparam file="$(find pses_navigation)/cfg/costmap_common_params.yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find pses_navigation)/cfg/costmap_common_params.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find pses_navigation)/cfg/local_costmap_params.yaml" command="load" />
+      <rosparam file="$(find pses_navigation)/cfg/global_costmap_params.yaml" command="load" />
+      <rosparam file="$(find pses_navigation)/cfg/base_local_planner_params.yaml" command="load" />
+      <rosparam file="$(find pses_navigation)/cfg/base_global_planner_params.yaml" command="load" />
+      <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+      <param name="base_global_planner" value="navfn/NavfnROS" />
+      <param name="controller_frequency" value="10.0"/>
+      <param name="agressive_reset" value="clear_costmap_recovery/ClearCostmapRecovery"/>
+    </node>
+
+        <!--<node pkg="pses_control" type="pses_trajectory" name="pses_trajectory" output="screen">
+        </node> -->
+
+</launch>

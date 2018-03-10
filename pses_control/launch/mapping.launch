@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+        <arg name="depth_image" default="/kinect2/sd/image_depth_rect"/>
+        <arg name="camera_frame" default="camera_depth_frame"/>	
+
+	<include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
+	</include>
+
+        <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
+		<remap from="image" to="$(arg depth_image)"/>
+        </node>
+
+	<include file="$(find hector_mapping)/launch/mapping_default.launch">
+		<arg name="base_frame" value="$(arg camera_frame)"/>
+		<arg name="odom_frame" value="$(arg camera_frame)"/>
+		<!--<arg name="map_frame" value="map"/>-->
+	</include>
+</launch>

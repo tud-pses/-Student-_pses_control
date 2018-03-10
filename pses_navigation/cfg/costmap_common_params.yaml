@@ -1,0 +1,23 @@
+obstacle_range: 5
+raytrace_range: 5.5
+footprint: [[-0.18, 0.105], [0.18, 0.105], [0.18,-0.105], [-0.18, -0.105]]
+#robot_radius: ir_of_robot
+map_type: costmap
+
+plugins:
+  - {name: static_map, type: "costmap_2d::StaticLayer"}
+  - {name: obstacle, type: "costmap_2d::VoxelLayer"}
+  - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+#  - {name: us, type: "range_sensor_layer::RangeSensorLayer"}
+
+#us:
+#   type: "range_sensor_layer::RangeSensorLayer"
+#   topics: ['/uc_bridge/usf']
+#   clear_on_max_reading: true
+
+obstacle:
+   observation_sources: laser_scan_sensor
+   laser_scan_sensor: {sensor_frame: base_laser, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
+
+inflation_layer:
+   inflation_radius: 0.05
