@@ -16,6 +16,8 @@ PsesTrajectory::PsesTrajectory() {
     f = boost::bind(&PsesTrajectory::paramCallback, this, _1, _2);
     m_server.setCallback(f);
     m_goal_counter=0;
+    m_problem_counter=0;
+    m_old_ack_velocity=0;
     m_problem_detected = false;
 }
 /*
@@ -54,7 +56,7 @@ void PsesTrajectory::publishGoal(){
         distance_to_goal = sqrt(pow((m_goal_pos_x-pose_pos_x),2)+pow((m_goal_pos_y-pose_pos_y),2));
     }
 
-    ROS_INFO("pose x : %f - pose y : %f - distance : %f - goal_pose_x : %f - goal_pos_y : %f", pose_pos_x, pose_pos_y, distance_to_goal, m_goal_pos_x, m_goal_pos_y);
+    //ROS_INFO("pose x : %f - pose y : %f - distance : %f - goal_pose_x : %f - goal_pos_y : %f", pose_pos_x, pose_pos_y, distance_to_goal, m_goal_pos_x, m_goal_pos_y);
 
     if (distance_to_goal < 1){
         ROS_INFO("counter: %d", m_goal_counter);
@@ -189,25 +191,33 @@ void PsesTrajectory::driveTrajectory(){
 
 void PsesTrajectory::clearCostmap() {
     bool execute_clear = false;
-    ros::Time duration_between_problem;
+    ros::Duration duration_between_problem;
 
-    if (m_old_ack_velocity * m_ack_velocity < 0 && m_problem_detected = false){
+    if (m_old_ack_velocity * m_ack_vel <= 0 && m_problem_detected == false){
         m_begin_change = ros::Time::now();
         m_problem_detected = true;
         m_problem_counter++;
     }
-    else if (m_old_ack_velocity * m_ack_velocity < 0 && m_problem_detected == true){
+    else if (m_old_ack_velocity * m_ack_vel <= 0 && m_problem_detected == true){
         duration_between_problem = ros::Time::now() - m_begin_change;
-        if (duration_between_problem.toSec() < 3){
+        if (duration_between_problem.toSec() < 2){
             m_problem_counter++;
-            if (m_problem_counter >= 7){
-                execute_clear == true;
-                m_problem_detected == false;
+            if (m_problem_counter >= 13){
+                execute_clear = true;
+                m_problem_detected = false;
+                m_problem_counter = 0;
             }
         }
         else {
             m_problem_counter = 0;
-            m_problem_detected == false;
+            m_problem_detected = false;
+        }
+    }
+    else {
+        duration_between_problem = ros::Time::now() - m_begin_change;
+        if (duration_between_problem.toSec() > 2){
+            m_problem_detected = false;
+            m_problem_counter = 0;
         }
     }
 
@@ -221,7 +231,8 @@ void PsesTrajectory::clearCostmap() {
 
         ccr.runBehavior();
     }
-    m_old_ack_velocity = m_ack_velocity;
+    m_old_ack_velocity = m_ack_vel;
+    ROS_INFO("problem counter = %d , m_problem_detected = %d, duration = %f , begin = %f", m_problem_counter, m_problem_detected, duration_between_problem.toSec(),m_begin_change.toSec());
 }
 
 void PsesTrajectory::reset() {
