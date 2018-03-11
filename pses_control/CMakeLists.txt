@@ -17,6 +17,9 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   ackermann_msgs
   geometry_msgs
+  tf
+  costmap_2d
+  clear_costmap_recovery
 )
 
 ## System dependencies are found with CMake's conventions

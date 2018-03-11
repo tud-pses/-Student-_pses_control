@@ -16,6 +16,7 @@ PsesTrajectory::PsesTrajectory() {
     f = boost::bind(&PsesTrajectory::paramCallback, this, _1, _2);
     m_server.setCallback(f);
     m_goal_counter=0;
+    m_problem_detected = false;
 }
 /*
 void PsesTrajectory::ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double* m_ack_steering, double* m_ack_vel)
@@ -186,6 +187,43 @@ void PsesTrajectory::driveTrajectory(){
     m_pub_steering.publish(m_steering);
 }
 
+void PsesTrajectory::clearCostmap() {
+    bool execute_clear = false;
+    ros::Time duration_between_problem;
+
+    if (m_old_ack_velocity * m_ack_velocity < 0 && m_problem_detected = false){
+        m_begin_change = ros::Time::now();
+        m_problem_detected = true;
+        m_problem_counter++;
+    }
+    else if (m_old_ack_velocity * m_ack_velocity < 0 && m_problem_detected == true){
+        duration_between_problem = ros::Time::now() - m_begin_change;
+        if (duration_between_problem.toSec() < 3){
+            m_problem_counter++;
+            if (m_problem_counter >= 7){
+                execute_clear == true;
+                m_problem_detected == false;
+            }
+        }
+        else {
+            m_problem_counter = 0;
+            m_problem_detected == false;
+        }
+    }
+
+    if (execute_clear) {
+        tf::TransformListener tf(ros::Duration(10));
+        costmap_2d::Costmap2DROS global_costmap("global_costmap", tf);
+        costmap_2d::Costmap2DROS local_costmap("local_costmap", tf);
+
+        clear_costmap_recovery::ClearCostmapRecovery ccr;
+        ccr.initialize("my_clear_costmap_recovery", &tf, &global_costmap, &local_costmap);
+
+        ccr.runBehavior();
+    }
+    m_old_ack_velocity = m_ack_velocity;
+}
+
 void PsesTrajectory::reset() {
     m_velocity.data = 0;
     m_steering.data = 0;
@@ -219,6 +257,7 @@ int main(int argc, char** argv) {
     while (ros::ok()) {
         controller.publishGoal();
         controller.driveTrajectory();
+        controller.clearCostmap();
         if (stop_request) {
             controller.reset();
             ros::shutdown();

@@ -14,6 +14,10 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <tf/transform_listener.h>
+#include <costmap_2d/costmap_2d_ros.h>
+#include <clear_costmap_recovery/clear_costmap_recovery.h>
+#include <ctime>
 
 class PsesTrajectory {
 
@@ -31,6 +35,7 @@ public:
     void driveTrajectory();
     void driveSteeringTest();
     void publishGoal();
+    void clearCostmap();
     void reset();
 
 private:
@@ -40,8 +45,11 @@ private:
     std_msgs::Int16 m_velocity, m_velocity_config, m_steering, m_steering_config, m_steering_min, m_steering_max;
     geometry_msgs::PoseStamped m_follow_goal;
     geometry_msgs::PoseWithCovarianceStamped m_amcl_pose;
-    int m_goal_counter;
+    int m_goal_counter, m_problem_counter;
     double m_goal_pos_x, m_goal_pos_y;
+    double m_old_ack_velocity;
+    ros::Time m_begin_change;
+    bool m_problem_detected;
 
     // Subscriber
     ros::Subscriber m_sub_ackermann_cmd;
