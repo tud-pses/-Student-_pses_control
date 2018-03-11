@@ -20,4 +20,5 @@ obstacle:
    laser_scan_sensor: {sensor_frame: base_laser, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
 
 inflation_layer:
-   inflation_radius: 0.05
+   inflation_radius: 1.0
+   cost_scaling_factor: 3 #0.7 for without obstacles
