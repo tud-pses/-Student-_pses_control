@@ -81,7 +81,7 @@ odom0: /odom
 # if unspecified, effectively making this parameter required for each sensor.
 odom0_config: [false,  false,  false,
               false, false, true,
-              true, true, false,
+              true, false, false,
               false, false, false,
               false, false, false]
 
@@ -160,7 +160,7 @@ twist0_nodelay: false
 # predicition. Note that if an acceleration measurement for the variable in question is available from one of the
 # inputs, the control term will be ignored.
 # Whether or not we use the control input during predicition. Defaults to false.
-use_control: true
+use_control: false
 # Whether the input (assumed to be cmd_vel) is a geometry_msgs/Twist or geometry_msgs/TwistStamped message. Defaults to
 # false.
 stamped_control: false
@@ -169,9 +169,9 @@ control_timeout: 0.2
 # Which velocities are being controlled. Order is vx, vy, vz, vroll, vpitch, vyaw.
 control_config: [true, false, false, false, false, true]
 # Places limits on how large the acceleration term will be. Should match your robot's kinematics.
-acceleration_limits: [1.3, 0.0, 0.0, 0.0, 0.0, 3.4]
+acceleration_limits: [0.56, 0.0, 0.0, 0.0, 0.0, 3.1]
 # Acceleration and deceleration limits are not always the same for robots.
-deceleration_limits: [1.3, 0.0, 0.0, 0.0, 0.0, 4.5]
+deceleration_limits: [0.3, 0.0, 0.0, 0.0, 0.0, 4.5]
 # If your robot cannot instantaneously reach its acceleration limit, the permitted change can be controlled with these
 # gains
 acceleration_gains: [0.8, 0.0, 0.0, 0.0, 0.0, 0.9]
