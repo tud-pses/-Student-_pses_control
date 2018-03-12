@@ -7,7 +7,7 @@
             <remap from="image" to="$(arg depth_image)"/>
     </node>
 
-    <!--<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan2" output="screen">
+    <!-- <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan2" output="screen">
             <remap from="image" to="$(arg depth_image)"/>
             <rosparam name="scan_height" value="5"/>
     </node>-->
@@ -29,7 +29,7 @@
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
       <param name="base_global_planner" value="navfn/NavfnROS" />
       <param name="controller_frequency" value="8.0"/>
-      <param name="recovery_behaviors" value=[{name: conservative_reset, type: clear_costmap_recovery/ClearCostmapRecovery}, {name: aggressive_reset, type: clear_costmap_recovery/ClearCostmapRecovery}]/>
+      <rosparam param="recovery_behaviors"> [{name: "conservative_reset", type: "clear_costmap_recovery/ClearCostmapRecovery"}, {name: "aggressive_reset", type: "clear_costmap_recovery/ClearCostmapRecovery"}] </rosparam>
       <param name="planner_patience" value="5.0"/>
       <param name="clearing_rotation_allowed" value="false"/>
     </node>

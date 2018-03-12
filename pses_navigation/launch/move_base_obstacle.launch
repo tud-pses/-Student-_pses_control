@@ -29,7 +29,7 @@
       <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
       <param name="base_global_planner" value="navfn/NavfnROS" />
       <param name="controller_frequency" value="8.0"/>
-      <param name="recovery_behaviors" value=[{name: conservative_reset, type: clear_costmap_recovery/ClearCostmapRecovery}, {name: aggressive_reset, type: clear_costmap_recovery/ClearCostmapRecovery}]/>
+      <rosparam param="recovery_behaviors"> [{name: "conservative_reset", type: "clear_costmap_recovery/ClearCostmapRecovery"}, {name: "aggressive_reset", type: "clear_costmap_recovery/ClearCostmapRecovery"}] </rosparam>
       <param name="planner_patience" value="5.0"/>
       <param name="clearing_rotation_allowed" value="false"/>
     </node>

@@ -69,8 +69,8 @@ void PsesTrajectory::publishGoal(){
              sleep(2);
              break;
         case 1:
-            m_goal_pos_x = 25.5;
-            m_goal_pos_y = 1.0;
+            m_goal_pos_x = 26.1;
+            m_goal_pos_y = 1.3;
             goal_orient_z = 0.0;
             goal_orient_w = 1.0;
             break;
@@ -81,8 +81,8 @@ void PsesTrajectory::publishGoal(){
             goal_orient_w = 0.707;
             break;
         case 3:
-            m_goal_pos_x = 27.75;
-            m_goal_pos_y = -5.0;
+            m_goal_pos_x = 27.9;
+            m_goal_pos_y = -5.7;
             goal_orient_z = -0.707;
             goal_orient_w = 0.707;
             break;
@@ -99,13 +99,13 @@ void PsesTrajectory::publishGoal(){
             goal_orient_w = 0.0;
             break;
         case 6:
-            m_goal_pos_x = 12.9;
+            m_goal_pos_x = 12.5;
             m_goal_pos_y = -4.5;
             goal_orient_z = 0.707;
             goal_orient_w = 0.707;
             break;
         case 7:
-            m_goal_pos_x = 13.0;
+            m_goal_pos_x = 12.7;
             m_goal_pos_y = -1.7;
             goal_orient_z = 0.707;
             goal_orient_w = 0.707;
@@ -267,7 +267,7 @@ int main(int argc, char** argv) {
     while (ros::ok()) {
         controller.publishGoal();
         controller.driveTrajectory();
-        controller.clearCostmap();
+        //controller.clearCostmap();
         if (stop_request) {
             controller.reset();
             ros::shutdown();
