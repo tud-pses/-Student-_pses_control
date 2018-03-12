@@ -58,7 +58,7 @@ void PsesTrajectory::publishGoal(){
 
     //ROS_INFO("pose x : %f - pose y : %f - distance : %f - goal_pose_x : %f - goal_pos_y : %f", pose_pos_x, pose_pos_y, distance_to_goal, m_goal_pos_x, m_goal_pos_y);
 
-    if (distance_to_goal < 1){
+    if (distance_to_goal < 1.5){
         ROS_INFO("counter: %d", m_goal_counter);
         switch (m_goal_counter) {
         case 0:
@@ -225,7 +225,6 @@ void PsesTrajectory::clearCostmap() {
         tf::TransformListener tf(ros::Duration(10));
         costmap_2d::Costmap2DROS global_costmap("global_costmap", tf);
         costmap_2d::Costmap2DROS local_costmap("local_costmap", tf);
-
         clear_costmap_recovery::ClearCostmapRecovery ccr;
         ccr.initialize("my_clear_costmap_recovery", &tf, &global_costmap, &local_costmap);
 
