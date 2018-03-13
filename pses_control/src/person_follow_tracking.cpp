@@ -49,9 +49,9 @@ Rect2d PersonFollowTracking::track(Mat& frame, Rect2d& bbox) {
     }
 
     // Calculate Frames per second (FPS)
-    double timer = (double)getTickCount();
+    //double timer = (double)getTickCount();
     init_ = tracker_->update(frame, bbox);
-    float fps = getTickFrequency() / ((double)getTickCount() - timer);
+    //float fps = getTickFrequency() / ((double)getTickCount() - timer);
 
     // Tracking success: Draw the tracked object
     if (init_)

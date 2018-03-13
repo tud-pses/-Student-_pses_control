@@ -1,42 +1,24 @@
-#include </home/pses/catkin_ws/src/pses_control/pses_control/include/pses_control/pses_trajectory.hpp>
+#include "../include/pses_control/pses_trajectory.hpp"
 
 PsesTrajectory::PsesTrajectory() {
     ros::NodeHandle params("~");	// use this for private params
 
     m_pub_velocity = nh.advertise<std_msgs::Int16>("/uc_bridge/set_motor_level_msg", 1);
     m_pub_steering = nh.advertise<std_msgs::Int16>("/uc_bridge/set_steering_level_msg", 1);
-
-    //m_sub_ackermann_cmd = nh.subscribe<ackermann_msgs::AckermannDriveStamped>("/ackermann_cmd_topic", 10, boost::bind(ackermannCmdCallback, _1, &m_ack_steering, &m_ack_vel));
     m_sub_ackermann_cmd = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 10, boost::bind(cmdCallback, _1, &m_ack_steering, &m_ack_vel));
-    //m_sub_follow_goal = nh.subscribe<geometry_msgs::PoseStamped>("/follow_goal", 10, boost::bind(followGoalCallback, _1,&m_follow_goal));
     m_sub_amcl_pose = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 10, boost::bind(amclPoseCallback, _1, &m_amcl_pose));
     m_pub_goal = nh.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal",1);
-
-    dynamic_reconfigure::Server<pses_control::controllerConfig>::CallbackType f;
-    f = boost::bind(&PsesTrajectory::paramCallback, this, _1, _2);
-    m_server.setCallback(f);
-    m_goal_counter=0;
-    m_problem_counter=0;
-    m_old_ack_velocity=0;
+    m_goal_counter = 0;
+    m_problem_counter = 0;
+    m_old_ack_velocity = 0;
     m_problem_detected = false;
 }
-/*
-void PsesTrajectory::ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double* m_ack_steering, double* m_ack_vel)
-{
-    //ROS_INFO("Ackermann Command : steering angle = %f - speed = %f", ackermannCmdMsg->drive.steering_angle, ackermannCmdMsg->drive.speed);
-    *m_ack_steering=ackermannCmdMsg->drive.steering_angle;
-    *m_ack_vel=ackermannCmdMsg->drive.speed;
-}
-*/
+
 void PsesTrajectory::cmdCallback(const geometry_msgs::Twist::ConstPtr& data, double* m_ack_steering, double* m_ack_vel){
   *m_ack_steering = data->angular.z;
   *m_ack_vel = data->linear.x;
 
 }
-
-/*void PsesTrajectory::followGoalCallback(const geometry_msgs::PoseStamped::ConstPtr& followGoalMsg, geometry_msgs::PoseStamped* m_follow_goal){
-    *m_follow_goal = *followGoalMsg;
-}*/
 
 void PsesTrajectory::amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& amcl_pose, geometry_msgs::PoseWithCovarianceStamped* m_amcl_pose){
     *m_amcl_pose = *amcl_pose;
@@ -55,8 +37,6 @@ void PsesTrajectory::publishGoal(){
     else{
         distance_to_goal = sqrt(pow((m_goal_pos_x-pose_pos_x),2)+pow((m_goal_pos_y-pose_pos_y),2));
     }
-
-    //ROS_INFO("pose x : %f - pose y : %f - distance : %f - goal_pose_x : %f - goal_pos_y : %f", pose_pos_x, pose_pos_y, distance_to_goal, m_goal_pos_x, m_goal_pos_y);
 
     if (distance_to_goal < 1.5){
         ROS_INFO("counter: %d", m_goal_counter);
@@ -116,7 +96,7 @@ void PsesTrajectory::publishGoal(){
             goal_orient_z = 0.0;
             goal_orient_w = 1.0;
             break;
-        default: //TODO
+        default:
             stop_request = true;
             m_goal_pos_x = pose_pos_x;
             m_goal_pos_y = pose_pos_y;
@@ -152,27 +132,18 @@ void PsesTrajectory::driveTrajectory(){
       m_ack_steering = 0.354883;
     }
 
-    /*if (m_ack_vel > 0.5)
-    {
-      m_velocity.data = 300;
-    }
-    else if (m_ack_vel < -0.5){
-      m_velocity.data = -300;
-    }
-    else{
-        m_velocity.data = m_ack_vel*600;
-    }*/
-
-    //m_steering.data = 7869.8 * pow(m_ack_steering, 5) - 17042 * pow(m_ack_steering, 4) - 1587 * pow(m_ack_steering, 3) + 3098 * pow(m_ack_steering, 2) + 2471.8 * m_ack_steering - 127.6;
+    // Model for converting steering angle from value to command
     m_steering.data = (196814 * pow(m_ack_steering, 6) - 50518 * pow(m_ack_steering, 5) - 47550 * pow(m_ack_steering, 4) + 5979.7 * pow(m_ack_steering, 3) + 2459.5 * pow(m_ack_steering, 2) - 2442.1 * m_ack_steering + 143.78);
 
-    //Velocity
+    // Limit for velocity value
     if (m_ack_vel < - 0.825872){
         m_velocity.data=-500;
     }
     else if (m_ack_vel > 2.013835){
         m_velocity.data=1000;
     }
+
+    // Model for converting velocity from value to command
     else if (m_ack_vel < 0 && m_ack_vel >= - 0.825872){
         m_velocity.data=477.52 * m_ack_vel - 104.62;
     }
@@ -183,25 +154,28 @@ void PsesTrajectory::driveTrajectory(){
         m_velocity.data = 0;
     }
 
-    //ROS_INFO("velocities : velocity_real = %d - velocity_ack = %f", m_velocity.data, m_ack_vel);
-
     m_pub_velocity.publish(m_velocity);
     m_pub_steering.publish(m_steering);
 }
 
 void PsesTrajectory::clearCostmap() {
+
     bool execute_clear = false;
     ros::Duration duration_between_problem;
 
+    // Detect if velocity value alternates between positive and negative for the first time
     if (m_old_ack_velocity * m_ack_vel <= 0 && m_problem_detected == false){
         m_begin_change = ros::Time::now();
         m_problem_detected = true;
         m_problem_counter++;
     }
+    // Detect if velocity value alternates between positive and negative and problem was already detected
     else if (m_old_ack_velocity * m_ack_vel <= 0 && m_problem_detected == true){
         duration_between_problem = ros::Time::now() - m_begin_change;
+        // Check if problem occured within the last 2 seconds
         if (duration_between_problem.toSec() < 2){
             m_problem_counter++;
+            // Check if problem occured more than 12 times within the last 2 seconds
             if (m_problem_counter >= 13){
                 execute_clear = true;
                 m_problem_detected = false;
@@ -221,7 +195,9 @@ void PsesTrajectory::clearCostmap() {
         }
     }
 
+    //Clear the costmap (but does not work correctly, does not find obstacle layer
     if (execute_clear) {
+
         tf::TransformListener tf(ros::Duration(10));
         costmap_2d::Costmap2DROS global_costmap("global_costmap", tf);
         costmap_2d::Costmap2DROS local_costmap("local_costmap", tf);
@@ -231,7 +207,6 @@ void PsesTrajectory::clearCostmap() {
         ccr.runBehavior();
     }
     m_old_ack_velocity = m_ack_vel;
-    ROS_INFO("problem counter = %d , m_problem_detected = %d, duration = %f , begin = %f", m_problem_counter, m_problem_detected, duration_between_problem.toSec(),m_begin_change.toSec());
 }
 
 void PsesTrajectory::reset() {
@@ -243,18 +218,6 @@ void PsesTrajectory::reset() {
 
 void signalHandler(int sig) {
     stop_request = true;
-}
-
-void PsesTrajectory::paramCallback(pses_control::controllerConfig &config, uint32_t level){
-    /*ROS_INFO("Reconfigure Request: %f %f %f %f %i", config.target_value, config.kp, config.ki, config.kd, config.velocity);
-    m_target_value = config.target_value;
-    m_kp = config.kp;
-    m_ki = config.ki;
-    m_kd = config.kd;
-    m_velocity_config.data = config.velocity;
-    m_steering_config.data = config.steering;
-    m_steering_min.data = config.pid_min;
-    m_steering_max.data = config.pid_max;*/
 }
 
 int main(int argc, char** argv) {

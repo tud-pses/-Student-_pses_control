@@ -14,6 +14,5 @@
 	<include file="$(find hector_mapping)/launch/mapping_default.launch">
 		<arg name="base_frame" value="$(arg camera_frame)"/>
 		<arg name="odom_frame" value="$(arg camera_frame)"/>
-		<!--<arg name="map_frame" value="map"/>-->
 	</include>
 </launch>

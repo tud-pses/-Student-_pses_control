@@ -27,49 +27,89 @@ public:
     // Variables
     ros::NodeHandle nh;	// use this for global access
 
-    // Subscriber
-
-    // Publisher
-
     // Functions
-    void driveTrajectory();
-    void driveSteeringTest();
+    /*
+     * NAME:        publishGoal
+     * DESCRIPTION: Publishes new goal when robot is close to current goal
+     * INPUT:
+     * OUTPUT:      void
+    */
     void publishGoal();
+
+    /*
+     * NAME:        driveTrajectory
+     * DESCRIPTION: Computes velocity and steering control variables
+     * INPUT:
+     * OUTPUT:      void
+    */
+    void driveTrajectory();
+
+    /*
+     * NAME:        clearCostmap (not in use)
+     * DESCRIPTION: Clears costmap when robot gets stuck
+     * INPUT:
+     * OUTPUT:      void
+    */
     void clearCostmap();
+
+    /*
+     * NAME:        reset
+     * DESCRIPTION: Set steering and velocity to zero
+     * INPUT:
+     * OUTPUT:      void
+    */
     void reset();
 
 private:
-    // Variables
-    dynamic_reconfigure::Server<pses_control::controllerConfig> m_server;
-    double m_ack_vel, m_ack_steering;
-    std_msgs::Int16 m_velocity, m_velocity_config, m_steering, m_steering_config, m_steering_min, m_steering_max;
-    geometry_msgs::PoseStamped m_follow_goal;
-    geometry_msgs::PoseWithCovarianceStamped m_amcl_pose;
-    int m_goal_counter, m_problem_counter;
-    double m_goal_pos_x, m_goal_pos_y;
-    double m_old_ack_velocity;
-    ros::Time m_begin_change;
-    bool m_problem_detected;
+
+    // Variables [note: command = Stellgroesse, value = physikalische Groesse]
+
+    std_msgs::Int16 m_velocity, m_steering;                 //velocity and steering command
+    double m_ack_vel, m_ack_steering;                       //velocity and steering values
+    geometry_msgs::PoseWithCovarianceStamped m_amcl_pose;   //AMCL pose
+    int m_goal_counter, m_problem_counter;                  //respective counters for currently activated goal and detection if robot is stuck
+    double m_goal_pos_x, m_goal_pos_y;                      //x and y position of current goal
+    double m_old_ack_velocity;                              //velocity value of previous iteration
+    ros::Time m_begin_change;                               //first time when robot is possibly stuck
+    bool m_problem_detected;                                //true when robot is possibly stuck
 
     // Subscriber
-    ros::Subscriber m_sub_ackermann_cmd;
-    //ros::Subscriber m_sub_follow_goal;
-    ros::Subscriber m_sub_amcl_pose;
+    ros::Subscriber m_sub_ackermann_cmd;                    //subscriber for velocity value topic
+    ros::Subscriber m_sub_amcl_pose;                        //subscriber for amcl pose topic
 
     // Publisher
-    ros::Publisher m_pub_velocity;
-    ros::Publisher m_pub_steering;
-    ros::Publisher m_pub_goal;
+    ros::Publisher m_pub_velocity;                          //publisher for velocity command
+    ros::Publisher m_pub_steering;                          //publisher for steering command
+    ros::Publisher m_pub_goal;                              //publisher for goal
 
     // Functions
-    void paramCallback(pses_control::controllerConfig &config, uint32_t level);
-    static void ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ackermannCmdMsg, double *m_ack_steering, double *m_ack_vel);
-    static void amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& amcl_pose, geometry_msgs::PoseWithCovarianceStamped *m_amcl_pose);
-    static void cmdCallback(const geometry_msgs::Twist::ConstPtr& data, double* m_ack_steering, double* m_ack_vel);
-    //static void followGoalCallback(const geometry_msgs::PoseStamped::ConstPtr& followGoalMsg, geometry_msgs::PoseStamped *m_follow_goal);
 
+    /*
+     * NAME:        cmdCallback
+     * DESCRIPTION: Stores steering and velocity data from TEB Local Planner in workspace variables
+     * INPUT:       const geometry_msgs::Twist::ConstPtr& data - command velocity (including x,y,z data for steering and velocity)
+     *              double* m_ack_steering - steering value (workspace)
+     *              double* m_ack_vel - velocity value (workspace)
+     * OUTPUT:      void
+    */
+    static void cmdCallback(const geometry_msgs::Twist::ConstPtr& data, double* m_ack_steering, double* m_ack_vel);
+
+    /*
+     * NAME:        amclPoseCallback
+     * DESCRIPTION: Stores pose from AMCL package in workspace variables
+     * INPUT:       const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& amcl_pose - AMCL pose
+     *              geometry_msgs::PoseWithCovarianceStamped *m_amcl_pose - AMCL pose (workspace)
+     * OUTPUT:      void
+    */
+    static void amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& amcl_pose, geometry_msgs::PoseWithCovarianceStamped *m_amcl_pose);
 };
 
+/*
+ * NAME:        signalHandler
+ * DESCRIPTION: Sets stop request to true when program is aborted
+ * INPUT:       int sig - aborting signal
+ * OUTPUT:      void
+*/
 void signalHandler(int sig);
 bool stop_request = false;
 

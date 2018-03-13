@@ -3,22 +3,19 @@
 
     <arg name="depth_image" default="/kinect_utilities/depth_image_filtered"/>
 
+    <!-- Create LaserScan -->
     <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan" output="screen">
             <remap from="image" to="$(arg depth_image)"/>
     </node>
 
-    <!--<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan2" output="screen">
-            <remap from="image" to="$(arg depth_image)"/>
-            <rosparam name="scan_height" value="5"/>
-    </node>-->
-
-    <!-- Run the map server-->
+    <!-- Run the map server -->
     <arg name="pses_map" default="/home/pses/catkin_ws/src/pses_control/pses_navigation/map2.yaml"/>
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg pses_map)"/>
 
-    <!-- Run AMCL-->
+    <!-- Run AMCL -->
     <include file="$(find amcl)/examples/amcl_diff.launch" />
 
+    <!-- Start Navigation Stack -->
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
       <rosparam file="$(find pses_navigation)/cfg/costmap_common_params_obstacle.yaml" command="load" ns="global_costmap" />
       <rosparam file="$(find pses_navigation)/cfg/costmap_common_params_obstacle.yaml" command="load" ns="local_costmap" />
@@ -33,8 +30,5 @@
       <param name="planner_patience" value="5.0"/>
       <param name="clearing_rotation_allowed" value="false"/>
     </node>
-
-        <!--<node pkg="pses_control" type="pses_trajectory" name="pses_trajectory" output="screen">
-        </node> -->
 
 </launch>
