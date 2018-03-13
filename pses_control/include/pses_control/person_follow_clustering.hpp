@@ -15,23 +15,24 @@ class PersonFollowClustering {
 
     public:
         PersonFollowClustering();
-		/*
-		 * NAME:			depthImageCallback
-		 * DESCRIPTION:		Receives a ROS depth image and converts it to an OpenCV Mat
-		 * INPUT:			const sensor_msgs::ImageConstPtr& depth_image
-		 * OUTPUT: 			
-		*/
-		
+
+        /*
+         * NAME:        depthImageCallback
+         * DESCRIPTION:	Receives a ROS depth image and converts it to an OpenCV Mat
+         * INPUT:       const sensor_msgs::ImageConstPtr& depth_image
+         * OUTPUT:      void
+        */
         void depthImageCallback(const sensor_msgs::ImageConstPtr& depth_image);
-		/*
-		 * NAME:			cluster
-		 * DESCRIPTION:		Applies a given bounding box on the depth image and performs a clustering within
-							for calculating the position of the person. Outputs a goal which is the position
-							of the person shifted towards the camera
-		 * INPUT:			Rect2d& bbox
-							double distance_to_person
-		 * OUTPUT: 			geometry_msgs::PoseStamped target - Position of person subtracted by a given distance
-		*/
+
+        /*
+         * NAME:        cluster
+         * DESCRIPTION: Applies a given bounding box on the depth image and performs a clustering within
+                        for calculating the position of the person. Outputs a goal which is the position
+                        of the person shifted towards the camera
+         * INPUT:       Rect2d& bbox
+                        double distance_to_person
+         * OUTPUT:      geometry_msgs::PoseStamped target - Position of person subtracted by a given distance
+        */
         geometry_msgs::PoseStamped cluster(Rect2d& bbox, double distance_to_person);
 
     private:

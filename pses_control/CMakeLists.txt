@@ -160,7 +160,6 @@ set(PERSON_FOLLOW_HEADER_FILES
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
   add_executable(${PROJECT_NAME}_node src/pses_control_node.cpp)
-  add_executable(pses_convert_to_ackermann src/pses_convert_to_ackermann.cpp)
   add_executable(person_follow ${PERSON_FOLLOW_SOURCE_FILES} ${PERSON_FOLLOW_HEADER_FILES})
   add_executable(pses_trajectory src/pses_trajectory.cpp)
   add_executable(pses_sensor_node src/pses_sensor_node.cpp)
@@ -175,16 +174,12 @@ set(PERSON_FOLLOW_HEADER_FILES
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_gencfg)
-add_dependencies(pses_convert_to_ackermann ${PROJECT_NAME}_gencfg)
 add_dependencies(person_follow ${PROJECT_NAME}_gencfg)
 add_dependencies(pses_trajectory ${PROJECT_NAME}_gencfg)
 add_dependencies(pses_sensor_node ${PROJECT_NAME}_gencf)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
-   ${catkin_LIBRARIES}
-)
-target_link_libraries(pses_convert_to_ackermann
    ${catkin_LIBRARIES}
 )
 target_link_libraries(pses_trajectory

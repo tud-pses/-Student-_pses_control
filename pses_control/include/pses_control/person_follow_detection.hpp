@@ -22,12 +22,12 @@ class PersonFollowDetection {
         PersonFollowDetection();
         // Functions
 		
-		/*
-		 * NAME:			detect
-		 * DESCRIPTION:		Detects person in color image
-		 * INPUT:			Mat& color_image
-		 * OUTPUT: 			Rect2d bbox - Bounding box of detected person in given image
-		*/
+        /*
+         * NAME:        detect
+         * DESCRIPTION:	Detects person in color image
+         * INPUT:       Mat& color_image
+         * OUTPUT:      Rect2d bbox - Bounding box of detected person in given image
+        */
         Rect2d detect(Mat& color_image);
 
     private:

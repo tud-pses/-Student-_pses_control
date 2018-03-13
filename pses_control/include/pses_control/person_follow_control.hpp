@@ -10,24 +10,26 @@ class PersonFollowControl {
 
     public:
         PersonFollowControl();
-		/*
-		 * NAME:			setGains
-		 * DESCRIPTION:		Sets parameter of controllers
-		 * INPUT:			double& kp_steering
-							double& kd_steering
-							double& kp_velocity
-							double& kd_velocity
-		 * OUTPUT: 			
-		*/
+
+        /*
+         * NAME:        setGains
+         * DESCRIPTION: Sets parameter of controllers
+         * INPUT:       double& kp_steering
+                        double& kd_steering
+                        double& kp_velocity
+                        double& kd_velocity
+         * OUTPUT:      void
+        */
         void setGains(double& kp_steering, double& kd_steering, double& kp_velocity, double& kd_velocity);
-		/*
-		 * NAME:			control
-		 * DESCRIPTION:		Controls velocity and steering of system
-		 * INPUT:			geometry_msgs::PoseStamped& target
-							float& steering
-							float& velocity
-		 * OUTPUT: 			
-		*/
+
+        /*
+         * NAME:        control
+         * DESCRIPTION:	Controls velocity and steering of system
+         * INPUT:       geometry_msgs::PoseStamped& target
+                        float& steering
+                        float& velocity
+         * OUTPUT:      void
+        */
         void control(geometry_msgs::PoseStamped& target, float& steering, float& velocity);
 
 

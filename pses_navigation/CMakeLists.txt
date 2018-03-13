@@ -10,7 +10,6 @@ project(pses_navigation)
 find_package(catkin REQUIRED COMPONENTS
   depthimage_to_laserscan
   pses_odometry
-  pses_transform
 )
 
 ## System dependencies are found with CMake's conventions
