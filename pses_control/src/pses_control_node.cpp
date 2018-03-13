@@ -53,7 +53,7 @@ void PsesControl::driveSteeringTest(){
 }
 
 void PsesControl::paramCallback(pses_control::controllerConfig &config, uint32_t level){
-    ROS_INFO("Reconfigure Request: %f %f %f %f %i", config.target_value, config.kp, config.ki, config.kd, config.velocity);
+    ROS_INFO("Reconfigure Request: \n Target Value %f \n KP: %f \n Ki: %f \n kd: %f \n Velocity %i", config.target_value, config.kp, config.ki, config.kd, config.velocity);
     m_target_value = config.target_value;
     m_kp = config.kp;
     m_ki = config.ki;
@@ -69,8 +69,10 @@ void PsesControl::pidControl() {
     {
         if (m_usl.range <= 0.1)    // Mode for carrying car
         {
+           // ROS_INFO("USL SCHLEIFE");
             m_velocity.data = 0;
         } else {    // pid controller
+           // ROS_INFO("PID SCHLEIFE");
             m_velocity.data = m_velocity_config.data;
             m_e = m_usr.range - m_target_value;
             m_e_sum = m_e_sum + m_e;
@@ -93,11 +95,13 @@ void PsesControl::pidControl() {
             m_e_last = m_e;
         }
     }
+   // ROS_INFO("M_Velocity: %i", m_velocity.data);
     m_pub_velocity.publish(m_velocity);
     m_pub_steering.publish(m_steering);
 }
 
 void PsesControl::reset() {
+    ROS_INFO("Reset pses_control_node");
     m_velocity.data = 0;
     m_steering.data = 0;
     m_pub_velocity.publish(m_velocity);

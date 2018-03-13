@@ -100,6 +100,7 @@ find_package(OpenCV)
  generate_dynamic_reconfigure_options(
    cfg/controller.cfg
    cfg/person_follow.cfg
+   cfg/sensors.cfg
 #   cfg/DynReconf2.cfg
  )
 
@@ -162,6 +163,7 @@ set(PERSON_FOLLOW_HEADER_FILES
   add_executable(pses_convert_to_ackermann src/pses_convert_to_ackermann.cpp)
   add_executable(person_follow ${PERSON_FOLLOW_SOURCE_FILES} ${PERSON_FOLLOW_HEADER_FILES})
   add_executable(pses_trajectory src/pses_trajectory.cpp)
+  add_executable(pses_sensor_node src/pses_sensor_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -176,6 +178,7 @@ add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_gencfg)
 add_dependencies(pses_convert_to_ackermann ${PROJECT_NAME}_gencfg)
 add_dependencies(person_follow ${PROJECT_NAME}_gencfg)
 add_dependencies(pses_trajectory ${PROJECT_NAME}_gencfg)
+add_dependencies(pses_sensor_node ${PROJECT_NAME}_gencf)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
@@ -190,6 +193,10 @@ target_link_libraries(pses_trajectory
 
 target_link_libraries(person_follow
    ${OpenCV_LIBS}
+   ${catkin_LIBRARIES}
+)
+
+target_link_libraries(pses_sensor_node
    ${catkin_LIBRARIES}
 )
 #############
