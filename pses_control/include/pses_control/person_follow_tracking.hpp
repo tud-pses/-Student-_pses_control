@@ -9,16 +9,34 @@
 using namespace cv;
 using namespace std;
 
-// Convert to string
-#define SSTR( x ) static_cast< std::ostringstream & >( \
-( std::ostringstream() << std::dec << x ) ).str()
-
 class PersonFollowTracking {
 
     public:
         PersonFollowTracking();
+		
+		/*
+		 * NAME:			track
+		 * DESCRIPTION:		Tracks content of given bounding box in given image
+		 * INPUT:			Mat& frame - Color image
+							Rect2d& bbox - Initialization bounding box from detector
+		 * OUTPUT: 			Rect2d bbox - Bounding box of person in given image
+		*/
         Rect2d track(Mat& frame, Rect2d& bbox);
+		
+		/*
+		 * NAME:			initTracker
+		 * DESCRIPTION:		Initializes the tracker by a given ID
+		 * INPUT:			int tracking_id
+		 * OUTPUT: 			
+		*/
         void initTracker(int tracking_id);
+		
+		/*
+		 * NAME:			setInit
+		 * DESCRIPTION:		Sets global variable if tracker is initialized
+		 * INPUT:			bool arg0 - False if initialization is necessary
+		 * OUTPUT: 			
+		*/
         void setInit(bool arg0);
 
     private:

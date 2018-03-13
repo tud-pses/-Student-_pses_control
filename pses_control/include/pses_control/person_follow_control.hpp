@@ -10,13 +10,32 @@ class PersonFollowControl {
 
     public:
         PersonFollowControl();
+		/*
+		 * NAME:			setGains
+		 * DESCRIPTION:		Sets parameter of controllers
+		 * INPUT:			double& kp_steering
+							double& kd_steering
+							double& kp_velocity
+							double& kd_velocity
+		 * OUTPUT: 			
+		*/
         void setGains(double& kp_steering, double& kd_steering, double& kp_velocity, double& kd_velocity);
+		/*
+		 * NAME:			control
+		 * DESCRIPTION:		Controls velocity and steering of system
+		 * INPUT:			geometry_msgs::PoseStamped& target
+							float& steering
+							float& velocity
+		 * OUTPUT: 			
+		*/
         void control(geometry_msgs::PoseStamped& target, float& steering, float& velocity);
 
 
     private:
         double kp_steering_, kd_steering_, kp_velocity_, kd_velocity_, last_error_x_, last_error_z_;
+		// time stamp of last iteration
         ros::Time last_time_;
+		// indicates if it is the first run of the object
         bool first_run_ = true;
 
 };

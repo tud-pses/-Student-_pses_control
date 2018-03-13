@@ -21,16 +21,21 @@ class PersonFollowDetection {
     public:
         PersonFollowDetection();
         // Functions
+		
+		/*
+		 * NAME:			detect
+		 * DESCRIPTION:		Detects person in color image
+		 * INPUT:			Mat& color_image
+		 * OUTPUT: 			Rect2d bbox - Bounding box of detected person in given image
+		*/
         Rect2d detect(Mat& color_image);
 
     private:
         // Publisher
-        //ros::Publisher pub_bounding_box_;
 
         // Variables
         Net net_;
         float confidence_thres_ = 0.8;
-        bool show_ = false;
 };
 
 #endif // PERSON_FOLLOW_DETECTION_HPP
