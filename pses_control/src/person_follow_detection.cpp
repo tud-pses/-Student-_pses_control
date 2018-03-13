@@ -48,7 +48,5 @@ Rect2d PersonFollowDetection::detect(Mat& color_image) {
     }
 	// imshow("Detect", color_image);
 	// waitKey(1);
-    }
-
     return bbox;
 }
