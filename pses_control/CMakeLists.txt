@@ -100,7 +100,7 @@ find_package(OpenCV)
  generate_dynamic_reconfigure_options(
    cfg/controller.cfg
    cfg/person_follow.cfg
-   cfg/sensors.cfg
+   cfg/sensor.cfg
 #   cfg/DynReconf2.cfg
  )
 
